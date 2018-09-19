@@ -39,7 +39,7 @@ public class Main{
 	public static final int numberOfPlayers = 2;
 	public final static int sizeSideHexagon = 3;
 	private final static int firstPlayer = 1;
-	private final static int depthToSearch = 3;
+	private final static int depthToSearch = 10;
 	// Check Bitboard
 	
 	public static void main(String[] args) {
@@ -53,8 +53,12 @@ public class Main{
 		gameV4 = new Game2(centralSize, firstPlayer, depthToSearch);
 		
 		System.out.println("The best search is: ");
+		long startTime = System.nanoTime();
 		System.out.println(Arrays.toString(alphaBeta(gameV4, depthToSearch, -99999999, 99999999)));
-
+		long endTime = System.nanoTime() ;
+		long duration = (endTime - startTime) * 10 ^ -9;  
+		System.out.println("It took: " +duration+ "s to calculate");
+		
 //		JFrame frame = new JFrame("Board 0");
 //		UserInterface2 ui = new UserInterface2(boardSize, centralSize, gameV4);
 //		
