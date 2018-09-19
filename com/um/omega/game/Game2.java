@@ -17,17 +17,15 @@ public class Game2 {
 	public int playerToPlay;
 	public int playerToRate;
 	public int depth;
-	private final int depthToSearch;
 	public String playHistory;
 
-	public Game2(ArrayList<Cell> player1, ArrayList<Cell> player2, ArrayList<Cell> emptyCells, Cell[] lastMove, int depth, int playerToPlay, int depthToSearch, String playHistory, int playerToRate) {
+	public Game2(ArrayList<Cell> player1, ArrayList<Cell> player2, ArrayList<Cell> emptyCells, Cell[] lastMove, int depth, int playerToPlay, String playHistory, int playerToRate) {
 //		System.out.println();
 //		System.out.println("New game has been created from previous");
 		this.player1 = player1;
 		this.player2 = player2;
 		this.emptyCells = emptyCells;
 		this.depth = depth;
-		this.depthToSearch = depthToSearch;
 		this.playHistory = playHistory;
 		rate = 0;
 		for(int i= 0; i < lastMove.length; i++) {
@@ -36,17 +34,16 @@ public class Game2 {
 		//calculateRate(playerToPlay);
 	}
 	
-	public Game2(int size, int playerToRate, int playerToPlaye,int depthToSearch) {
+	public Game2(int numberOfHexagonsCenterRow, int playerToRate, int playerToPlay) {
 		depth = 0;
 		rate = 0;
 		playHistory = "";
 		this.playerToRate = playerToRate;
-		this.depthToSearch = depthToSearch;
 		this.playerToPlay = playerToPlay;
-		int half = size / 2;
+		int half = numberOfHexagonsCenterRow / 2;
 //		int empty = 0;
-		for (int row = 0; row < size; row++) {
-            int cols = size - java.lang.Math.abs(row - half);
+		for (int row = 0; row < numberOfHexagonsCenterRow; row++) {
+            int cols = numberOfHexagonsCenterRow - java.lang.Math.abs(row - half);
             for (int col = 0; col < cols; col++) {
 //            	int r = empty > 4 ? new Random().nextInt(2) + 1 : new Random().nextInt(3);
 //            	if(r == 0) {
@@ -130,18 +127,18 @@ public class Game2 {
 		emptyCells.remove(cell);
 		if(player == 1) player1.add(cell);
 		else player2.add(cell);
-		playHistory += "(" +player+ ", " +cell.x+ ", " +cell.y+ ") ";
+		playHistory += "(" +player+ ", " +cell.x+ ", " +cell.y+ ").";
 	}
 	
 	public void setCellToPlayer(int player, int x, int y) {
-//		System.out.println("The cell to change is: " +cell.getPointString()+ ", to Player: " +player);
 		Cell cellToChange = new Cell(x, y);
+//		System.out.println("The cell to change is: " +cellToChange.getPointString()+ ", to Player: " +player);
 		for(Cell cell: emptyCells) {
 			if(cell.equals(new Cell(x, y))) {
 				emptyCells.remove(cell);
 				if(player == 1) player1.add(cell);
 				else player2.add(cell);
-				playHistory += "(" +player+ ", " +cell.x+ ", " +cell.y+ ") ";
+				playHistory += "(" +player+ ", " +cell.x+ ", " +cell.y+ ").";
 				return;
 			}
 		}
@@ -181,7 +178,6 @@ public class Game2 {
 											new Cell[]{cell, cell2}, 
 											depth + 1,
 											playerToPlay == 1 ? 2 : 1,
-											depthToSearch,
 											playHistory,
 											playerToRate));
 			}

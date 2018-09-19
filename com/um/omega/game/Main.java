@@ -40,7 +40,8 @@ public class Main{
 	public final static int sizeSideHexagon = 3;
 	private final static int playerToRate = 1;
 	private final static int firstPlayer = 1;
-	private final static int depthToSearch = 10;
+	private final static int depthToSearch = 7;
+	private static int numberOfHexagonsCenterRow;
 	// Check Bitboard
 	
 	public static void main(String[] args) {
@@ -49,24 +50,27 @@ public class Main{
 //		game = new GameSituation(testWhite, testBlack);
 //		gameV2 = new GameSituationV2(testGameV2);
 		
-		int centralSize = sizeSideHexagon * 2 - 1;
+		numberOfHexagonsCenterRow = sizeSideHexagon * 2 - 1;
 		
-		gameV4 = new Game2(centralSize, firstPlayer, playerToRate, depthToSearch);
+		gameV4 = new Game2(numberOfHexagonsCenterRow, playerToRate, firstPlayer);
 		
 		System.out.println("The best search is: ");
-		long startTime = System.nanoTime();
-		System.out.println(Arrays.toString(alphaBeta(gameV4, depthToSearch, -99999999, 99999999)));
-		long endTime = System.nanoTime() ;
+		long startTime = System.nanoTime() * 10 ^ -9;
+		String[] result = alphaBeta(gameV4, depthToSearch, -99999999, 99999999);
+		long endTime = System.nanoTime() * 10 ^ -9;
+//		System.out.println(Arrays.asList(result));
 		long duration = (endTime - startTime) * 10 ^ -9;  
-		System.out.println("It took: " +duration+ "s to calculate");
+		System.out.println("Start time: " +startTime+ ", endTime: "+endTime+ ", duration: " +duration+ " s");
 		
-//		JFrame frame = new JFrame("Board 0");
-//		UserInterface2 ui = new UserInterface2(boardSize, centralSize, gameV4);
-//		
-//		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//		frame.add(ui);
-//		frame.setSize(boardSize, boardSize);
-//		frame.setVisible(true);
+		gameV4 = parser(result[0]);
+		
+		JFrame frame = new JFrame("Board 0");
+		UserInterface2 ui = new UserInterface2(boardSize, numberOfHexagonsCenterRow, gameV4);
+		
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.add(ui);
+		frame.setSize(boardSize, boardSize);
+		frame.setVisible(true);
 //		long white = gameV4.getRate(1);
 //		long black = gameV4.getRate(2);
 //		System.out.println("The score is P1 (white): " +white+ ", and P2 (black): " +black);
@@ -133,6 +137,16 @@ public class Main{
 			if(score >= beta) break;
 		}
 		return valueToReturn;
+	}
+	
+	public static Game2 parser(String s) {
+		Game2 game = new Game2(numberOfHexagonsCenterRow, playerToRate, firstPlayer);
+		String[] list = s.split("\\.");
+		for(String cell: list) {
+			String[] cellData = cell.replace("(", "").replace(")", "").replace(" ", "").split(",");
+			game.setCellToPlayer(Integer.valueOf(cellData[0]), Integer.valueOf(cellData[1]), Integer.valueOf(cellData[2]));
+		}
+		return game;
 	}
 	
 //	public static void calculatePossibleCells(){
