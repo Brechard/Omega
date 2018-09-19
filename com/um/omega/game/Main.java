@@ -40,7 +40,7 @@ public class Main{
 	public final static int sizeSideHexagon = 3;
 	private final static int playerToRate = 1;
 	private final static int firstPlayer = 1;
-	private final static int depthToSearch = 7;
+	private final static int depthToSearch = 5;
 	private static int numberOfHexagonsCenterRow;
 	// Check Bitboard
 	
@@ -54,15 +54,18 @@ public class Main{
 		
 		gameV4 = new Game2(numberOfHexagonsCenterRow, playerToRate, firstPlayer);
 		
+		long startTime = System.currentTimeMillis();
 		System.out.println("The best search is: ");
-		long startTime = System.nanoTime() * 10 ^ -9;
 		String[] result = alphaBeta(gameV4, depthToSearch, -99999999, 99999999);
-		long endTime = System.nanoTime() * 10 ^ -9;
-//		System.out.println(Arrays.asList(result));
-		long duration = (endTime - startTime) * 10 ^ -9;  
-		System.out.println("Start time: " +startTime+ ", endTime: "+endTime+ ", duration: " +duration+ " s");
+		long endTime = System.currentTimeMillis();
 		
-		gameV4 = parser(result[0]);
+		gameV4 = parser(result[1]);
+		System.out.println("Points for player: " +playerToRate+ " = " +gameV4.getRate(playerToRate)+ ".");
+		System.out.println("The history of the game is: "+result[1]);
+		double duration = (endTime - startTime) * 0.001;  
+		int minutes = (int) duration/60;
+		System.out.println("It took " +minutes+ " minutes " +(duration - minutes * 60) +" s to calculate it.");
+		
 		
 		JFrame frame = new JFrame("Board 0");
 		UserInterface2 ui = new UserInterface2(boardSize, numberOfHexagonsCenterRow, gameV4);
@@ -118,20 +121,20 @@ public class Main{
 	
 	public static String[] alphaBeta(Game2 game, int depth, int alpha, int beta) {
 //		System.out.println("The game observed now is: " +game.playHistory);
-		if(!game.isPossibleMoreMoves() || depth == 0) return new String[] {game.playHistory, String.valueOf(game.getRate())};
+		if(!game.isPossibleMoreMoves() || depth == 0) return new String[] {String.valueOf(game.getRate()), game.playHistory};
 		
 		int score = (int) -999999999;
 
-		String[] valueToReturn = new String[] {"", String.valueOf(score)};
-		String[] valueHelper = new String[] {"", String.valueOf(score)};
+		String[] valueToReturn = new String[] {String.valueOf(score), ""};
+		String[] valueHelper = new String[] {String.valueOf(score), ""};
 		ArrayList<Game2> childGames = game.possibleGames();
 		int value;
 		for(int child = 0; child < childGames.size(); child++) {
 			valueHelper = alphaBeta(childGames.get(child), depth -1, -beta, -alpha);
-			value = -Integer.valueOf(valueHelper[1]);
+			value = -Integer.valueOf(valueHelper[0]);
 			if(value > score) {
 				score = value;
-				valueToReturn = new String[]{valueHelper[0], String.valueOf(value)};
+				valueToReturn = new String[]{String.valueOf(value), valueHelper[1]};
 			}
 			if(score > alpha) alpha = score;
 			if(score >= beta) break;

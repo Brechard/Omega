@@ -78,7 +78,7 @@ public class Game2 {
 	}
 	
 	public long getRate(int player) {
-		return player == playerToRate ? rate : calculateRate(player);
+		return player == playerToRate ? getRate() : calculateRate(player);
 	}
 	
 	public long calculateRate(int player){
