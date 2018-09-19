@@ -38,6 +38,7 @@ public class Main{
 	public static Game2 gameV4;
 	public static final int numberOfPlayers = 2;
 	public final static int sizeSideHexagon = 3;
+	private final static int playerToRate = 1;
 	private final static int firstPlayer = 1;
 	private final static int depthToSearch = 10;
 	// Check Bitboard
@@ -50,7 +51,7 @@ public class Main{
 		
 		int centralSize = sizeSideHexagon * 2 - 1;
 		
-		gameV4 = new Game2(centralSize, firstPlayer, depthToSearch);
+		gameV4 = new Game2(centralSize, firstPlayer, playerToRate, depthToSearch);
 		
 		System.out.println("The best search is: ");
 		long startTime = System.nanoTime();
@@ -103,7 +104,7 @@ public class Main{
 
 	}
 	
-	private static Game2 bestGame;
+//	private static Game2 bestGame;
 	
 //	private static String getRatint() {
 //		System.out.println("What is the score?");
@@ -134,63 +135,63 @@ public class Main{
 		return valueToReturn;
 	}
 	
-	public static void calculatePossibleCells(){
-
-		int half = sizeSideHexagon / 2;
-        for (int row = 0; row < sizeSideHexagon; row++) {
-            int cols = sizeSideHexagon - java.lang.Math.abs(row - half);
-//            System.out.println("Draw the row: " + row + ", with " + cols + " columns");
-            for (int col = 0; col < cols; col++) {
-//                System.out.println("Draw the col: " + col);
-                possibleCells.add(new Cell(row < half ? col - row : col - half, row - half));
-            }
-        }
-        System.out.println("The possible cells are:");
-        for(Cell i: possibleCells)
-            System.out.println(i.getPointString());
-
-	}
-	
-	public static void calculatePossibleCellsForTestV2(){
-
-		int half = sizeSideHexagon / 2;
-		int x;
-		int y;
-		int player;
-        for (int row = 0; row < sizeSideHexagon; row++) {
-            int cols = sizeSideHexagon - java.lang.Math.abs(row - half);
-//            System.out.println("Draw the row: " + row + ", with " + cols + " columns");
-            for (int col = 0; col < cols; col++) {
-            	x = (int) row < half ? col - row : col - half;
-            	y = (int) row - half;
-
-            	if(x == 0 && y == -2
-    			|| x == 1 && y == -2
-    			|| x == 0 && y == -1
-    			|| x == -1 && y == 1
-    			|| x == -2 && y == 2
-    			|| x == 2 && y == 0
-    			|| x == 1 && y == 1)
-            		player = 1;
-
-            	else if (x == 2 && y == -2
-        			|| x == -2 && y == 0
-        			|| x == 1 && y == 0
-        			|| x == -1 && y == 2
-        			|| x == -1 && y == 0
-        			|| x == 0 && y == 1
-        			|| x == 0 && y == 2) 
-            			player = 2;
-            	else player = 0;
-            	testGameV2.add(new Cell(x, y, player));
-//                System.out.println("Add the cell: (" +x+ ", " +y+ ") to the player: " +player);
-            }
-        }
-        
-        System.out.println("The possible cells for V2 are:");
-        for(Cell i: testGameV2)
-            System.out.println(i.getPointStringPlayer());
-        
-	}
+//	public static void calculatePossibleCells(){
+//
+//		int half = sizeSideHexagon / 2;
+//        for (int row = 0; row < sizeSideHexagon; row++) {
+//            int cols = sizeSideHexagon - java.lang.Math.abs(row - half);
+////            System.out.println("Draw the row: " + row + ", with " + cols + " columns");
+//            for (int col = 0; col < cols; col++) {
+////                System.out.println("Draw the col: " + col);
+//                possibleCells.add(new Cell(row < half ? col - row : col - half, row - half));
+//            }
+//        }
+//        System.out.println("The possible cells are:");
+//        for(Cell i: possibleCells)
+//            System.out.println(i.getPointString());
+//
+//	}
+//	
+//	public static void calculatePossibleCellsForTestV2(){
+//
+//		int half = sizeSideHexagon / 2;
+//		int x;
+//		int y;
+//		int player;
+//        for (int row = 0; row < sizeSideHexagon; row++) {
+//            int cols = sizeSideHexagon - java.lang.Math.abs(row - half);
+////            System.out.println("Draw the row: " + row + ", with " + cols + " columns");
+//            for (int col = 0; col < cols; col++) {
+//            	x = (int) row < half ? col - row : col - half;
+//            	y = (int) row - half;
+//
+//            	if(x == 0 && y == -2
+//    			|| x == 1 && y == -2
+//    			|| x == 0 && y == -1
+//    			|| x == -1 && y == 1
+//    			|| x == -2 && y == 2
+//    			|| x == 2 && y == 0
+//    			|| x == 1 && y == 1)
+//            		player = 1;
+//
+//            	else if (x == 2 && y == -2
+//        			|| x == -2 && y == 0
+//        			|| x == 1 && y == 0
+//        			|| x == -1 && y == 2
+//        			|| x == -1 && y == 0
+//        			|| x == 0 && y == 1
+//        			|| x == 0 && y == 2) 
+//            			player = 2;
+//            	else player = 0;
+//            	testGameV2.add(new Cell(x, y, player));
+////                System.out.println("Add the cell: (" +x+ ", " +y+ ") to the player: " +player);
+//            }
+//        }
+//        
+//        System.out.println("The possible cells for V2 are:");
+//        for(Cell i: testGameV2)
+//            System.out.println(i.getPointStringPlayer());
+//        
+//	}
 
 }

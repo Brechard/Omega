@@ -15,11 +15,12 @@ public class Game2 {
 	private long rate;
 	private Cell[] lastMove;
 	public int playerToPlay;
+	public int playerToRate;
 	public int depth;
 	private final int depthToSearch;
 	public String playHistory;
 
-	public Game2(ArrayList<Cell> player1, ArrayList<Cell> player2, ArrayList<Cell> emptyCells, Cell[] lastMove, int depth, int playerToPlay, int depthToSearch, String playHistory) {
+	public Game2(ArrayList<Cell> player1, ArrayList<Cell> player2, ArrayList<Cell> emptyCells, Cell[] lastMove, int depth, int playerToPlay, int depthToSearch, String playHistory, int playerToRate) {
 //		System.out.println();
 //		System.out.println("New game has been created from previous");
 		this.player1 = player1;
@@ -28,20 +29,22 @@ public class Game2 {
 		this.depth = depth;
 		this.depthToSearch = depthToSearch;
 		this.playHistory = playHistory;
+		rate = 0;
 		for(int i= 0; i < lastMove.length; i++) {
 			setCellToPlayer(i + 1, lastMove[i]);
 		}
-		calculateRate(playerToPlay);
+		//calculateRate(playerToPlay);
 	}
 	
-	public Game2(int size, int playerToPlay, int depthToSearch) {
+	public Game2(int size, int playerToRate, int playerToPlaye,int depthToSearch) {
 		depth = 0;
 		rate = 0;
 		playHistory = "";
-		this.playerToPlay = playerToPlay;
+		this.playerToRate = playerToRate;
 		this.depthToSearch = depthToSearch;
+		this.playerToPlay = playerToPlay;
 		int half = size / 2;
-		int empty = 0;
+//		int empty = 0;
 		for (int row = 0; row < size; row++) {
             int cols = size - java.lang.Math.abs(row - half);
             for (int col = 0; col < cols; col++) {
@@ -56,29 +59,29 @@ public class Game2 {
 //        			player2.add(new Cell(row < half ? col - row : col - half, row - half));
             }
         }
-		calculateRate(playerToPlay);
-		System.out.println("The empty cells are: ");
-		for(Cell c: emptyCells)
-			System.out.print(c.getPointString());
-		System.out.println();
 
-		System.out.println("The player 1 (white) cells are: ");
-		for(Cell c: player1)
-			System.out.print(c.getPointString());
-		System.out.println();
-
-		System.out.println("The player 2 (black) cells are: ");
-		for(Cell c: player2)
-			System.out.print(c.getPointString());
-		System.out.println();
+//		System.out.println("The empty cells are: ");
+//		for(Cell c: emptyCells)
+//			System.out.print(c.getPointString());
+//		System.out.println();
+//
+//		System.out.println("The player 1 (white) cells are: ");
+//		for(Cell c: player1)
+//			System.out.print(c.getPointString());
+//		System.out.println();
+//
+//		System.out.println("The player 2 (black) cells are: ");
+//		for(Cell c: player2)
+//			System.out.print(c.getPointString());
+//		System.out.println();
 	}
 	
 	public long getRate() {
-		return rate;
+		return rate == 0 ? calculateRate(playerToRate) : rate;
 	}
 	
 	public long getRate(int player) {
-		return player == playerToPlay ? rate : calculateRate(player);
+		return player == playerToRate ? rate : calculateRate(player);
 	}
 	
 	public long calculateRate(int player){
@@ -179,7 +182,8 @@ public class Game2 {
 											depth + 1,
 											playerToPlay == 1 ? 2 : 1,
 											depthToSearch,
-											playHistory));
+											playHistory,
+											playerToRate));
 			}
 		}
 		return possibleGames;
