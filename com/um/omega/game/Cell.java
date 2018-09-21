@@ -1,38 +1,26 @@
 package com.um.omega.game;
 
+import java.security.SecureRandom;
+
 public class Cell{
     
-	public final int x;
-    public final int y;
-    /*
-     * Possible states of the variable are:
-     * 0: It is not occupied
-     * 1: Occupied by the player 1
-     * 2: Occupied by the player 2
-     * and so on
-     */
-    public int occupied;
+	public int x;
+    public int y;
+    public long hash;
     
 //    public final int z;
-    public static Cell[] cube_directions = {
-                           new Cell(+1, -1), new Cell(+1, 0), new Cell(0, +1), 
-                           new Cell(-1, +1), new Cell(-1, 0), new Cell(0, -1), 
+    public static int[][] cube_directions = {
+                           new int[] {1, -1}, new int[] {1, 0}, new int[] {0, 1}, 
+                           new int[] {-1, 1}, new int[] {-1, 0}, new int[] {0, -1} 
     };
     
     public Cell(int x, int y){
         this.x = x;
         this.y = y;
+        hash = new SecureRandom().nextLong(); 
 //        this.z = - x - y;
     }
     
-    public Cell(int x, int y, int occupied){
-        this.x = x;
-        this.y = y;
-        this.occupied = occupied;
-//        this.z = - x - y;
-    }
-
-
     /**
      * Checks if the point passed as parameter is the a neighbor or not
      * @param p point to check if neighbor of
@@ -40,8 +28,8 @@ public class Cell{
      */
     public boolean isNeighbor(Cell p) {
     	
-    	for(Cell d: cube_directions)
-    		if(equals(movePoint(p, d))) return true;
+    	for(int[] d: cube_directions)
+    		if(equals(p.x + d[0], p.y + d[1])) return true;
     				
     	return false;
     }
@@ -50,37 +38,27 @@ public class Cell{
     	return x == p.x && y == p.y; 
     }
     
+    public boolean equals(int x, int y) {
+    	return this.x == x && this.y == y; 
+    }
+
     /**
      * 
      * @param p Point to move
      * @param direction where to move
      * @return Point moved
      */
-    public Cell movePoint(Cell p, Cell direction) {
-    	return new Cell(p.x + direction.x, p.y + direction.y);
+    public void movePoint(Cell p, int[] direction) {
+    	p.x += direction[0]; 
+    	p.y += direction[1]; 
     }
-
-	public int getOccupied() {
-		return occupied;
-	}
-
-	public void setOccupied(int occupied) {
-		this.occupied = occupied;
-	}
     
     /**
      * Method mainly for debugging
      * @return Coordinates in string to represent easily
      */
-    public String getPointString() {
+    public String print() {
     	return "(" + x + ", " + y + ")";
     }
 
-    /**
-     * Method mainly for debugging
-     * @return Coordinates in string to represent easily
-     */
-    public String getPointStringPlayer() {
-    	return "(" + x + ", " + y + ") occupied by player: " +occupied+ ".";
-    }
 }

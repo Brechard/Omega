@@ -2,6 +2,7 @@ package com.um.omega.game;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Scanner;
 
 import javax.swing.JFrame;
@@ -11,11 +12,12 @@ public class Main{
 	public final static int boardSize = 800;
 	public static Game game;
 	public static final int numberOfPlayers = 2;
-	public final static int sizeSideHexagon = 3;
+	public final static int sizeSideHexagon = 4;
 	private final static int playerToRate = 1;
 	private final static int firstPlayer = 1;
-	private final static int depthToSearch = 5;
+	private final static int depthToSearch = 10;
 	private static int numberOfHexagonsCenterRow;
+	private static HashMap<Long, TTInfo> hashMap = new HashMap<Long, TTInfo>();
 //	private static int numberOfSearches = 0;
 	// Check Bitboard
 	
@@ -23,14 +25,15 @@ public class Main{
 
 		numberOfHexagonsCenterRow = sizeSideHexagon * 2 - 1;
 		game = new Game(numberOfHexagonsCenterRow, playerToRate, firstPlayer);
-		multipleSearch(5);
+//		multipleSearch(10);
+		oneSearch();
 	}
 	
 	public static void oneSearch() {
 //		numberOfSearches = 0;
 		long startTime = System.currentTimeMillis();
 		System.out.println("The best search is:");
-		String[] result = alphaBeta(game, depthToSearch, -99999999, 99999999);
+		String[] result = alphaBetaWithTT(game, depthToSearch, -99999999, 99999999);
 		long  endTime = System.currentTimeMillis();
 		game = parser(result[1]);
 		System.out.println("Points for player: " +playerToRate+ " = " +game.getPunctuation(playerToRate)+ ".");
@@ -39,6 +42,8 @@ public class Main{
 		int minutes = (int) duration/60;
 //		System.out.println("The algorithm has done: " +numberOfSearches+ " searches");
 		System.out.println("It took " +minutes+ " minutes " +(duration - minutes * 60) +" s to calculate it.");
+//		System.out.println("Repeteaded hashes: " +hashCount);
+		printGame(game, "Board");
 	}
 	
 	public static void multipleSearch(int n) {
@@ -50,7 +55,7 @@ public class Main{
 		for(int i = 0; i < n; i++) {
 //			numberOfSearches = 0;
 			startTime = System.currentTimeMillis();
-			alphaBeta(game, depthToSearch, -99999999, 99999999);
+			alphaBetaWithTT(game, depthToSearch, -99999999, 99999999);
 			endTime = System.currentTimeMillis();
 			duration = (endTime - startTime) * 0.001;  
 			minutes = (int) duration/60;
@@ -63,10 +68,19 @@ public class Main{
 		System.out.println("Doing " +n+ " searches, the averga time was: " +avg+ ", meaning: " +minutes+ " minutes " +(avg - minutes * 60) +" s");
 	}
 	
+//	public static int hashCount = 0;
+//	public static ArrayList<Long> hashes = new ArrayList<>();
+
 	public static String[] alphaBeta(Game game, int depth, int alpha, int beta) {
 //		numberOfSearches++;
 //		System.out.println("The game observed now is: " +game.playHistory);
-		if(!game.isPossibleMoreMoves() || depth == 0) return new String[] {String.valueOf(game.getRate()), game.playHistory};
+		if(!game.isPossibleMoreMoves() || depth == 0) {
+//			long h = game.getHash();
+//			if(hashes.contains(h))
+//				hashCount++;
+//			else hashes.add(h);
+			return new String[] {String.valueOf(game.getRate()), game.playHistory};
+		}
 		
 		int score = (int) -999999999;
 
@@ -87,8 +101,42 @@ public class Main{
 		return valueToReturn;
 	}
 	
+	public static String[] alphaBetaWithTT(Game game, int depth, long alpha, long beta) {
+		long hash = game.getHash();
+		if(hashMap.containsKey(hash))
+			return hashMap.get(hash).getInfo();
+//		numberOfSearches++;
+//		System.out.println("The game observed now is: " +game.playHistory);
+		if(!game.isPossibleMoreMoves() || depth == 0) {
+//			long h = game.getHash();
+//			if(hashes.contains(h))
+//				hashCount++;
+//			else hashes.add(h);
+			return new String[] {String.valueOf(game.getRate()), game.playHistory};
+		}
+		
+		long score = (long) -999999999;
+
+		String[] valueToReturn = new String[] {String.valueOf(score), ""};
+		String[] valueHelper = new String[] {String.valueOf(score), ""};
+		ArrayList<Game> childGames = game.possibleGames();
+		long value;
+		for(int child = 0; child < childGames.size(); child++) {
+			valueHelper = alphaBetaWithTT(childGames.get(child), depth -1,(long) -beta,(long) -alpha);
+			value = -Long.valueOf(valueHelper[0]);
+			if(value > score) {
+				score = value;
+				valueToReturn = new String[]{String.valueOf(value), valueHelper[1]};
+			}
+			if(score > alpha) alpha = score;
+			if(score >= beta) break;
+		}
+		hashMap.put(hash, new TTInfo(0, valueHelper));
+		return valueToReturn;
+	}
+
+	
 	public static Game parser(String s) {
-		Game game = new Game(numberOfHexagonsCenterRow, playerToRate, firstPlayer);
 		String[] list = s.split("\\.");
 		for(String cell: list) {
 			String[] cellData = cell.replace("(", "").replace(")", "").replace(" ", "").split(",");

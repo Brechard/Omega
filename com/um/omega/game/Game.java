@@ -92,7 +92,7 @@ public class Game {
 					group = 1;
 					alreadyCounted.add(cell);
 					searchNeighbor(cell, playerCells);
-					rate = rate * group - Math.abs(3 - group);
+					rate = rate * group;
 //					System.out.print("Player: " +player+ ", finish with the point: " +cell.getPointString()+ " RN the group count is: " +group);
 //					System.out.println(", and the rate count is: " +rate);
 				}
@@ -146,7 +146,7 @@ public class Game {
 	public void setCellToPlayer(int player, Cell cell) {
 //		System.out.println("The cell to change is: " +cell.getPointString()+ ", to Player: " +player);
 		if(!emptyCells.contains(cell))
-			throw new Error("The cell " +cell.getPointString()+" is not empty");
+			throw new Error("The cell " +cell.print()+" is not empty");
 		emptyCells.remove(cell);
 		if(player == 1) player1.add(cell);
 		else player2.add(cell);
@@ -154,10 +154,9 @@ public class Game {
 	}
 	
 	public void setCellToPlayer(int player, int x, int y) {
-		Cell cellToChange = new Cell(x, y);
 //		System.out.println("The cell to change is: " +cellToChange.getPointString()+ ", to Player: " +player);
 		for(Cell cell: emptyCells) {
-			if(cell.equals(new Cell(x, y))) {
+			if(cell.equals(x, y)) {
 				emptyCells.remove(cell);
 				if(player == 1) player1.add(cell);
 				else player2.add(cell);
@@ -165,7 +164,7 @@ public class Game {
 				return;
 			}
 		}
-		throw new Error("The cell " +cellToChange.getPointString()+" is not empty");
+		throw new Error("The cell (" +x+", " +y+ ") is not empty");
 	}
 
 	
@@ -199,5 +198,14 @@ public class Game {
 			}
 		}
 		return possibleGames;
+	}
+	
+	public long getHash() {
+		long hash = 0;
+		for(Cell c: player1)
+			hash ^= c.hash;
+		for(Cell c: player2)
+			hash ^= c.hash;
+		return hash;
 	}
 }
