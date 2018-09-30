@@ -7,10 +7,13 @@ import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.util.ArrayList;
 
 import javax.swing.JPanel;
 
-public class UserInterface extends JPanel{
+import Helpers.Moves;
+
+public class UserInterface extends JPanel implements MouseListener{
 	private static int xPos = 100;
 	private static int yPos = 200;
 	private static int width = 10;
@@ -18,6 +21,7 @@ public class UserInterface extends JPanel{
 	private static int boardSize;
 	private static int numberHexMiddleRow;
 	private static Game game;
+	private static ArrayList<Hexagon> grid = new ArrayList<>();
 //	private static int x = 0;
 //	private static int y = 0;
 	
@@ -26,6 +30,7 @@ public class UserInterface extends JPanel{
 		this.boardSize = boardSize;
 		this.numberHexMiddleRow = size * 2 - 1;
 		this.game = game;
+        addMouseListener(this);
 	}
 		
 	public void paintComponent(Graphics g){
@@ -60,7 +65,7 @@ public class UserInterface extends JPanel{
 		hex.draw((Graphics2D) g, posX, posY, 4, 0xCCCCCC, false);
 		hex.draw((Graphics2D) g, posX, posY, 4, getColor(player), true);
 //		System.out.println("Draw: " +cell.getPointString()+ ", player: " +player);
-
+		grid.add(hex);
 		g.setFont(new Font("TimesRoman", Font.BOLD, 15));
 		if(player == 1) // The player 1 is white so the letters have to be black
         	g.setColor(Color.BLACK);
@@ -76,5 +81,52 @@ public class UserInterface extends JPanel{
 		else if(player == 1) return 0xFFFFFF;
 		else return 0x000000; // Player 2 is black
 	}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		// TODO Auto-generated method stub
+
+		if(Main.playerToPlay != 0) {
+			System.out.println("Click " +e.getX()+ "," +e.getY());
+			for(Hexagon h: grid) {
+				if(h.contains(e.getX(), e.getY())) {
+					String pos = "(" +h.getxCubePosition()+ "," + h.getyCubePosition() +")";
+					System.out.println("The cell clicked is: " +pos);
+					boolean insertData = Moves.parseMove(Main.playerToPlay, pos);
+					if(!insertData) {
+						Moves.setPlayerMove(pos);
+						Moves.played();
+					}
+					break;
+				}
+			}
+			
+		}
+
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

@@ -1,6 +1,7 @@
 package com.um.omega.game;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Game {
 
@@ -10,13 +11,14 @@ public class Game {
 	public ArrayList<Cell> alreadyCounted;
 	private int group;
 	private long rate;
+	private long punctuation;
 	private Cell[] lastMove;
 	public int playerToPlay;
 	public int playerToRate;
 	public int depth;
 	public String playHistory;
 	
-	public Game(ArrayList<Cell> player1, ArrayList<Cell> player2, ArrayList<Cell> emptyCells, Cell[] lastMove, int depth, int playerToPlay, String playHistory, int playerToRate) {
+	public Game(ArrayList<Cell> player1, ArrayList<Cell> player2, ArrayList<Cell> emptyCells, Cell[] lastMove, int depth, int playerToPlay, String playHistory) {
 //		System.out.println();
 //		System.out.println("New game has been created from previous");
 		this.player1 = player1;
@@ -31,11 +33,10 @@ public class Game {
 		//calculateRate(playerToPlay);
 	}
 	
-	public Game(int numberOfHexagonsCenterRow, int playerToRate, int playerToPlay) {
+	public Game(int numberOfHexagonsCenterRow, int playerToPlay) {
 		depth = 0;
 		rate = 0;
 		playHistory = "";
-		this.playerToRate = playerToRate;
 		this.playerToPlay = playerToPlay;
 		int half = numberOfHexagonsCenterRow / 2;
 //		int empty = 0;
@@ -71,7 +72,7 @@ public class Game {
 	}
 	
 	public long getRate() {
-		return rate == 0 ? calculateRate(playerToRate) : rate;
+		return rate == 0 ? calculateRate(playerToPlay) : rate;
 	}
 	
 	/**
@@ -93,6 +94,9 @@ public class Game {
 					alreadyCounted.add(cell);
 					searchNeighbor(cell, playerCells);
 					rate = rate * group;
+//					if(group > 3)
+//						rate -= (group - 3) * 3;
+
 //					System.out.print("Player: " +player+ ", finish with the point: " +cell.getPointString()+ " RN the group count is: " +group);
 //					System.out.println(", and the rate count is: " +rate);
 				}
@@ -109,7 +113,7 @@ public class Game {
 	public long getPunctuation(int player) {
 		alreadyCounted = new ArrayList<>();
 		group = 0;
-		rate = 1;
+		punctuation = 1;
 		ArrayList<Cell> playerCells = (player == 1) ? player1 : player2;
 
 		playerCells.stream().filter(cell -> !alreadyCounted.contains(cell)).forEach(
@@ -117,11 +121,11 @@ public class Game {
 					group = 1;
 					alreadyCounted.add(cell);
 					searchNeighbor(cell, playerCells);
-					rate = rate * group;
+					punctuation = punctuation * group;
 				}
 			);
 
-		return rate;
+		return punctuation;
 	}
 
 	
@@ -144,7 +148,7 @@ public class Game {
 	}
 	
 	public void setCellToPlayer(int player, Cell cell) {
-//		System.out.println("The cell to change is: " +cell.getPointString()+ ", to Player: " +player);
+//		System.out.println("The cell to change is: " +cell.print()+ ", to Player: " +player);
 		if(!emptyCells.contains(cell))
 			throw new Error("The cell " +cell.print()+" is not empty");
 		emptyCells.remove(cell);
@@ -153,18 +157,33 @@ public class Game {
 		playHistory += "(" +player+ ", " +cell.x+ ", " +cell.y+ ").";
 	}
 	
-	public void setCellToPlayer(int player, int x, int y) {
-//		System.out.println("The cell to change is: " +cellToChange.getPointString()+ ", to Player: " +player);
+	public void setCellToPlayer(int player, int x, int y) throws Error{
 		for(Cell cell: emptyCells) {
 			if(cell.equals(x, y)) {
 				emptyCells.remove(cell);
 				if(player == 1) player1.add(cell);
 				else player2.add(cell);
-				playHistory += "(" +player+ ", " +cell.x+ ", " +cell.y+ ").";
+//				playHistory += "(" +player+ ", " +cell.x+ ", " +cell.y+ ").";
 				return;
 			}
 		}
 		throw new Error("The cell (" +x+", " +y+ ") is not empty");
+	}
+
+	public void deleteMove(int player, int x, int y) {
+//		System.out.println("Delete from the player " +player+ " (" +x+ ", " +y+")");
+		ArrayList<Cell> playerList = (player == 1) ? player1 : player2;
+//		System.out.println("Size" +playerList.size());
+		
+		for(Cell cell: playerList) {
+			if(cell.equals(x, y)) {
+				System.out.println("Deleted cell: " +cell.print()+ " of player ");
+				playerList.remove(cell);
+				emptyCells.add(cell);
+				return;
+			}
+		}
+		
 	}
 
 	
@@ -186,24 +205,25 @@ public class Game {
 			newEmptyCells = new ArrayList<Cell>(emptyCells);
 			newEmptyCells.remove(cell);
 			for(Cell cell2: newEmptyCells) {
-//				System.out.println("We are going to create a new game with: Player 1: " +cell.getPointString()+ ", player 2: " +cell2.getPointString());
+//				System.out.println("We are going to create a new game with: Player 1: " +cell.print()+ ", player 2: " +cell2.print());
 				possibleGames.add(new Game(new ArrayList<Cell>(player1), 
 											new ArrayList<Cell>(player2), 
 											new ArrayList<Cell>(emptyCells), 
 											new Cell[]{cell, cell2}, 
 											depth + 1,
 											playerToPlay == 1 ? 2 : 1,
-											playHistory,
-											playerToRate));
+											playHistory));
 			}
 		}
 		return possibleGames;
 	}
 	
+	
 	public long getHash() {
 		long hash = 0;
 		for(Cell c: player1)
 			hash ^= c.hash;
+		hash *= 2;
 		for(Cell c: player2)
 			hash ^= c.hash;
 		return hash;
