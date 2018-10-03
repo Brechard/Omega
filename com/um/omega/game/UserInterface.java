@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import javax.swing.JPanel;
 
 import Helpers.Moves;
+import Helpers.Parsers;
 
 public class UserInterface extends JPanel implements MouseListener{
 	private static int xPos = 100;
@@ -92,7 +93,7 @@ public class UserInterface extends JPanel implements MouseListener{
 				if(h.contains(e.getX(), e.getY())) {
 					String pos = "(" +h.getxCubePosition()+ "," + h.getyCubePosition() +")";
 					System.out.println("The cell clicked is: " +pos);
-					boolean insertData = Moves.parseMove(Main.playerToPlay, pos);
+					boolean insertData = Parsers.parseMove(Main.playerToPlay, pos);
 					if(!insertData) {
 						Moves.setPlayerMove(pos);
 						Moves.played();

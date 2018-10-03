@@ -16,7 +16,7 @@ public class Game {
 	public int playerToPlay;
 	public int playerToRate;
 	public int depth;
-	public String playHistory;
+	private String playHistory;
 	
 	public Game(ArrayList<Cell> player1, ArrayList<Cell> player2, ArrayList<Cell> emptyCells, Cell[] lastMove, int depth, int playerToPlay, String playHistory) {
 //		System.out.println();
@@ -147,7 +147,12 @@ public class Game {
 				emptyCells.size() > 4;
 	}
 	
-	public void setCellToPlayer(int player, Cell cell) {
+	/**
+	 * This method is used internally and therefore the changes are added to the history
+	 * @param player
+	 * @param cell
+	 */
+	private void setCellToPlayer(int player, Cell cell) {
 //		System.out.println("The cell to change is: " +cell.print()+ ", to Player: " +player);
 		if(!emptyCells.contains(cell))
 			throw new Error("The cell " +cell.print()+" is not empty");
@@ -157,6 +162,13 @@ public class Game {
 		playHistory += "(" +player+ ", " +cell.x+ ", " +cell.y+ ").";
 	}
 	
+	/**
+	 * This method is used outside the class and therefore there history will not be recorded until the moves are confirmed
+	 * @param player
+	 * @param x
+	 * @param y
+	 * @throws Error
+	 */
 	public void setCellToPlayer(int player, int x, int y) throws Error{
 		for(Cell cell: emptyCells) {
 			if(cell.equals(x, y)) {
@@ -218,7 +230,20 @@ public class Game {
 		return possibleGames;
 	}
 	
-	
+	/**
+	 * @return the playHistory
+	 */
+	public String getPlayHistory() {
+		return playHistory;
+	}
+
+	/**
+	 * @param playHistory the playHistory to set
+	 */
+	public void setPlayHistory(String playHistory) {
+		this.playHistory = playHistory;
+	}
+
 	public long getHash() {
 		long hash = 0;
 		for(Cell c: player1)

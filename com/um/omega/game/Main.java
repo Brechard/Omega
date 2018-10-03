@@ -1,6 +1,5 @@
 package com.um.omega.game;
 
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -8,7 +7,9 @@ import java.util.Scanner;
 
 import javax.swing.JFrame;
 
+import Helpers.Flag;
 import Helpers.Moves;
+import Helpers.Parsers;
 
 public class Main{
 	
@@ -16,15 +17,15 @@ public class Main{
 	public static Game game;
 	public static String gameHistory;
 	public static final int numberOfPlayers = 2;
-	public final static int sizeSideHexagon = 4;
+	public final static int sizeSideHexagon = 3;
 	
 	private final static int depthToSearch = 6;
 	public static int numberOfHexagonsCenterRow;
-	private static HashMap<Long, TTInfo> hashMap = new HashMap<Long, TTInfo>();
 	private static JFrame frame = new JFrame("Board");
 	public static int playerToPlay;
 	public static String player1Move;
 	public static String player2Move;
+	
 	// private static int numberOfSearches = 0;
 	// Check Bitboard
 	
@@ -38,7 +39,6 @@ public class Main{
 		System.out.println("What player plays first? The opponent (2) or me (1)?");
 		int whoPlaysFirst = Integer.valueOf(sc.nextLine());
 		game = new Game(numberOfHexagonsCenterRow, whoPlaysFirst);
-
 		if(whoPlaysFirst == 1) {
 			playerToPlay = 0;
 			oneSearch();
@@ -88,13 +88,14 @@ public class Main{
 		System.out.println("Calculating ...");
 //		game.playHistory = "";
 		long startTime = System.currentTimeMillis();
-		String[] result = alphaBetaWithTT(game, depthToSearch, -99999999, 99999999);
+		String[] result = SearchAlgorithms.aspirationSearch(game, 10, depthToSearch);		
+//		String[] result = SearchAlgorithms.alphaBetaWithTT(game, depthToSearch, -99999999, 99999999);
 		long  endTime = System.currentTimeMillis();
 		System.out.println("Response: " +Arrays.asList(result));
-		Moves.parseGame(result[1]);
-		Moves.parseNextMove(result[1]);
-//		System.out.println("Player 1 = " +game.getPunctuation(1)+ ".");
-//		System.out.println("Player 2 = " +game.getPunctuation(2)+ ".");
+		Parsers.parseGameDebug(result[1]);
+		Parsers.parseNextMove(result[1]);
+		System.out.println("Player 1 = " +game.getPunctuation(1)+ ".");
+		System.out.println("Player 2 = " +game.getPunctuation(2)+ ".");
 //		System.out.println("The history of the game is: "+result[1]);
 		double duration = (endTime - startTime) * 0.001;  
 		int minutes = (int) duration/60;
@@ -119,7 +120,7 @@ public class Main{
 		for(int i = 0; i < n; i++) {
 //			numberOfSearches = 0;
 			startTime = System.currentTimeMillis();
-			alphaBetaWithTT(game, depthToSearch, -99999999, 99999999);
+			SearchAlgorithms.alphaBetaWithTT(game, depthToSearch, -99999999, 99999999);
 			endTime = System.currentTimeMillis();
 			duration = (endTime - startTime) * 0.001;  
 			minutes = (int) duration/60;
@@ -132,76 +133,6 @@ public class Main{
 		System.out.println("Doing " +n+ " searches, the averga time was: " +avg+ ", meaning: " +minutes+ " minutes " +(avg - minutes * 60) +" s");
 	}
 	
-//	public static int hashCount = 0;
-//	public static ArrayList<Long> hashes = new ArrayList<>();
-
-	public static String[] alphaBeta(Game game, int depth, int alpha, int beta) {
-//		numberOfSearches++;
-//		System.out.println("The game observed now is: " +game.playHistory);
-		if(!game.isPossibleMoreMoves() || depth == 0) {
-//			long h = game.getHash();
-//			if(hashes.contains(h))
-//				hashCount++;
-//			else hashes.add(h);
-			return new String[] {String.valueOf(game.getRate()), game.playHistory};
-		}
-		
-		int score = (int) -999999999;
-
-		String[] valueToReturn = new String[] {String.valueOf(score), ""};
-		String[] valueHelper = new String[] {String.valueOf(score), ""};
-		ArrayList<Game> childGames = game.possibleGames();
-		int value;
-		for(int child = 0; child < childGames.size(); child++) {
-			valueHelper = alphaBeta(childGames.get(child), depth -1, -beta, -alpha);
-			value = -Integer.valueOf(valueHelper[0]);
-			if(value > score) {
-				score = value;
-				valueToReturn = new String[]{String.valueOf(value), valueHelper[1]};
-			}
-			if(score > alpha) alpha = score;
-			if(score >= beta) break;
-		}
-		return valueToReturn;
-	}
-	
-	public static String[] alphaBetaWithTT(Game game, int depth, long alpha, long beta) {
-		long hash = game.getHash();
-		if(hashMap.containsKey(hash) && hashMap.get(hash).depth >= depth) {
-//			System.out.println("The hash of the game found is: " +game.getHash());
-			return hashMap.get(hash).getInfo();
-		}
-//		System.out.println("Hash not found: " +game.getHash());
-
-//		numberOfSearches++;
-//		System.out.println("The game observed now is: " +game.playHistory);
-		if(!game.isPossibleMoreMoves() || depth == 0) {
-//			long h = game.getHash();
-//			if(hashes.contains(h))
-//				hashCount++;
-//			else hashes.add(h);
-			return new String[] {String.valueOf(game.getRate()), game.playHistory};
-		}
-		
-		long score = (long) -999999999;
-
-		String[] valueToReturn = new String[] {String.valueOf(score), ""};
-		String[] valueHelper = new String[] {String.valueOf(score), ""};
-		ArrayList<Game> childGames = game.possibleGames();
-		long value;
-		for(int child = 0; child < childGames.size(); child++) {
-			valueHelper = alphaBetaWithTT(childGames.get(child), depth -1,(long) -beta,(long) -alpha);
-			value = -Long.valueOf(valueHelper[0]);
-			if(value > score) {
-				score = value;
-				valueToReturn = new String[]{String.valueOf(value), valueHelper[1]};
-			}
-			if(score > alpha) alpha = score;
-			if(score >= beta) break;
-		}
-		hashMap.put(hash, new TTInfo(0, valueHelper, depth));
-		return valueToReturn;
-	}
 
 	
 	public static void printGame() {
