@@ -17,8 +17,11 @@ public class Game {
 	public int playerToRate;
 	public int depth;
 	private String playHistory;
+	public UnionFind union1;
+	public UnionFind union2;
 	
-	public Game(ArrayList<Cell> player1, ArrayList<Cell> player2, ArrayList<Cell> emptyCells, Cell[] lastMove, int depth, int playerToPlay, String playHistory) {
+	public Game(ArrayList<Cell> player1, ArrayList<Cell> player2, ArrayList<Cell> emptyCells, Cell[] lastMove, 
+			int depth, int playerToPlay, String playHistory, UnionFind union1, UnionFind union2) {
 //		System.out.println();
 //		System.out.println("New game has been created from previous");
 		this.player1 = player1;
@@ -26,6 +29,8 @@ public class Game {
 		this.emptyCells = emptyCells;
 		this.depth = depth;
 		this.playHistory = playHistory;
+		this.union1 = new UnionFind(union1);
+		this.union2 = new UnionFind(union2);
 		rate = 0;
 		for(int i= 0; i < lastMove.length; i++) {
 			setCellToPlayer(i + 1, lastMove[i]);
@@ -33,6 +38,11 @@ public class Game {
 		//calculateRate(playerToPlay);
 	}
 	
+	/**
+	 * Create a game from scratch, all cells are created
+	 * @param numberOfHexagonsCenterRow
+	 * @param playerToPlay
+	 */
 	public Game(int numberOfHexagonsCenterRow, int playerToPlay) {
 		depth = 0;
 		rate = 0;
@@ -45,7 +55,7 @@ public class Game {
             for (int col = 0; col < cols; col++) {
 //            	int r = empty > 4 ? new Random().nextInt(2) + 1 : new Random().nextInt(3);
 //            	if(r == 0) {
-            		emptyCells.add(new Cell(row < half ? col - row : col - half, row - half));
+            		emptyCells.add(new Cell(row < half ? col - row : col - half, row - half, emptyCells.size()));
 //            		empty++;
 //            	}
 //            	else if(r == 1)
@@ -54,21 +64,54 @@ public class Game {
 //        			player2.add(new Cell(row < half ? col - row : col - half, row - half));
             }
         }
-
+		createNeighbours();
+		union1 = new UnionFind(emptyCells.size());
+		union2 = new UnionFind(emptyCells.size());
 //		System.out.println("The empty cells are: ");
 //		for(Cell c: emptyCells)
-//			System.out.print(c.getPointString());
+//			System.out.print(c.print());
 //		System.out.println();
 //
 //		System.out.println("The player 1 (white) cells are: ");
 //		for(Cell c: player1)
-//			System.out.print(c.getPointString());
+//			System.out.print(c.print());
 //		System.out.println();
 //
 //		System.out.println("The player 2 (black) cells are: ");
 //		for(Cell c: player2)
-//			System.out.print(c.getPointString());
+//			System.out.print(c.print());
 //		System.out.println();
+	}
+	public void move_played(int player, Cell cell) {
+		ArrayList<Cell> playerCells = player == 1 ? player1 : player2;
+		
+		for(Cell neighbour: cell.getNeighbours()) {
+			if(playerCells.contains(neighbour)) {
+				if(player == 1)
+					union1.unite(cell.id, neighbour.id);
+				else 
+					union2.unite(cell.id, neighbour.id);
+			}
+		}
+	}
+	
+	public void printUnions() {
+		System.out.println();
+		System.out.println("Union 1: ");
+		union1.printUnionFind();
+		System.out.println();
+		System.out.println("Union 2: ");
+		union2.printUnionFind();
+	}
+	
+	public void move_played(int player, int x, int y) {
+		for(Cell cell: emptyCells) {
+			if(cell.equals(x, y)) {
+				move_played(player, cell);
+				return;
+			}
+		}
+		throw new Error("The cell (" +x+", " +y+ ") is not empty");
 	}
 	
 	public long getRate() {
@@ -127,11 +170,10 @@ public class Game {
 
 		return punctuation;
 	}
-
 	
 	public void searchNeighbor(Cell point, ArrayList<Cell> cells) {
 		cells.stream()
-				.filter(cell -> !alreadyCounted.contains(cell) && point.isNeighbor(cell))
+				.filter(cell -> !alreadyCounted.contains(cell) && point.isNeighbour(cell))
 				.forEach(
 					cell -> {
 						alreadyCounted.add(cell);
@@ -147,6 +189,19 @@ public class Game {
 				emptyCells.size() > 4;
 	}
 	
+	public void createNeighbours() {
+		ArrayList<Cell> cellsToSearch = new ArrayList<>(emptyCells);
+		for(Cell c: emptyCells) {
+			cellsToSearch.remove(c);
+			for(Cell c1: cellsToSearch) {
+				if(c.isNeighbour(c1)) {
+					c.addNeighbour(c1);
+					c1.addNeighbour(c);
+				}
+			}
+		}
+	}
+	
 	/**
 	 * This method is used internally and therefore the changes are added to the history
 	 * @param player
@@ -159,6 +214,7 @@ public class Game {
 		emptyCells.remove(cell);
 		if(player == 1) player1.add(cell);
 		else player2.add(cell);
+		move_played(player, cell);
 		playHistory += "(" +player+ ", " +cell.x+ ", " +cell.y+ ").";
 	}
 	
@@ -172,9 +228,11 @@ public class Game {
 	public void setCellToPlayer(int player, int x, int y) throws Error{
 		for(Cell cell: emptyCells) {
 			if(cell.equals(x, y)) {
+				move_played(player, x, y);
 				emptyCells.remove(cell);
 				if(player == 1) player1.add(cell);
 				else player2.add(cell);
+				move_played(player, cell);
 //				playHistory += "(" +player+ ", " +cell.x+ ", " +cell.y+ ").";
 				return;
 			}
@@ -197,17 +255,6 @@ public class Game {
 		}
 		
 	}
-
-	
-	/** 
-	 * First version where we simply remove the move, it could be better if we can reset the object back and retrieve the possibleGames search
-	 */
-	public void undoMove() {
-		player1.remove(lastMove[0]);
-		player2.remove(lastMove[1]);
-		emptyCells.add(lastMove[0]);
-		emptyCells.add(lastMove[1]);
-	}
 	
 	public ArrayList<Game> possibleGames() {
 			
@@ -224,7 +271,9 @@ public class Game {
 											new Cell[]{cell, cell2}, 
 											depth + 1,
 											playerToPlay == 1 ? 2 : 1,
-											playHistory));
+											playHistory,
+											union1,
+											union2));
 			}
 		}
 		return possibleGames;

@@ -38,7 +38,7 @@ public class UserInterface extends JPanel implements MouseListener{
 		super.paintComponent(g);
 //		this.setBackground(Color.YELLOW);
 //		g.drawString("Omega", Main.sizeX / 2, 50);
-		drawHexagonGrid(g, new Cell(boardSize / 2, boardSize/2), numberHexMiddleRow , boardSize / numberHexMiddleRow, 0);
+		drawHexagonGrid(g, new Cell(boardSize / 2, boardSize/2, 0), numberHexMiddleRow , boardSize / numberHexMiddleRow, 0);
 	}
 	
 	private void drawHexagonGrid(Graphics g, Cell origin, int size, int radius, int padding) {
@@ -74,7 +74,7 @@ public class UserInterface extends JPanel implements MouseListener{
         	g.setColor(Color.WHITE);
         g.drawString(Integer.toString(cell.x) , posX - radius/2, posY - radius/4);
         g.drawString(Integer.toString(cell.y), posX + radius/2, posY - radius/4);
-        g.drawString(Integer.toString(- cell.x - cell.y), posX, posY + radius/4);
+        g.drawString(Integer.toString(cell.id), posX, posY + radius/4);
 	}
 	
 	private int getColor(int player) {
@@ -85,7 +85,6 @@ public class UserInterface extends JPanel implements MouseListener{
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		// TODO Auto-generated method stub
 
 		if(Main.playerToPlay != 0) {
 			System.out.println("Click " +e.getX()+ "," +e.getY());

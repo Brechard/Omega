@@ -46,7 +46,7 @@ public class Parsers {
 		try{
 			Main.game.setCellToPlayer(player, Integer.valueOf(xy[0]), Integer.valueOf(xy[1]));
 		} catch (Error e) {
-			System.out.println("Cell already in use");
+			System.out.println(e+ ", cell already in use");
 			return true;
 		}
 		setGameHistoryProvisional(getGameHistoryProvisional() + "("+player+", " +xy[0]+ ", " +xy[1]+ ").");

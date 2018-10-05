@@ -1,24 +1,41 @@
 package com.um.omega.game;
 
 import java.security.SecureRandom;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
 
 public class Cell{
     
 	public int x;
     public int y;
     public long hash;
-    
-//    public final int z;
+    private HashSet<Cell> neighbours = new HashSet<Cell>() {};
+    public int id;
+
     public static int[][] cube_directions = {
                            new int[] {1, -1}, new int[] {1, 0}, new int[] {0, 1}, 
                            new int[] {-1, 1}, new int[] {-1, 0}, new int[] {0, -1} 
     };
     
-    public Cell(int x, int y){
+    public Cell(int x, int y, int id){
         this.x = x;
         this.y = y;
-        hash = new SecureRandom().nextLong(); 
-//        this.z = - x - y;
+        this.id = id;
+        hash = new SecureRandom().nextLong();
+    }
+    
+    public Cell(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+
+	public void addNeighbour(Cell c) {
+    	neighbours.add(c);
+    }
+    
+    public HashSet<Cell> getNeighbours(){
+    	return neighbours;
     }
     
     /**
@@ -26,7 +43,7 @@ public class Cell{
      * @param p point to check if neighbor of
      * @return boolean
      */
-    public boolean isNeighbor(Cell p) {
+    public boolean isNeighbour(Cell p) {
     	
     	for(int[] d: cube_directions)
     		if(equals(p.x + d[0], p.y + d[1])) return true;

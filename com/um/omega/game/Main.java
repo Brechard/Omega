@@ -17,9 +17,9 @@ public class Main{
 	public static Game game;
 	public static String gameHistory;
 	public static final int numberOfPlayers = 2;
-	public final static int sizeSideHexagon = 3;
+	public final static int sizeSideHexagon = 4;
 	
-	private final static int depthToSearch = 6;
+	private final static int depthToSearch = 4;
 	public static int numberOfHexagonsCenterRow;
 	private static JFrame frame = new JFrame("Board");
 	public static int playerToPlay;
@@ -38,7 +38,19 @@ public class Main{
 		
 		System.out.println("What player plays first? The opponent (2) or me (1)?");
 		int whoPlaysFirst = Integer.valueOf(sc.nextLine());
-		game = new Game(numberOfHexagonsCenterRow, whoPlaysFirst);
+		game = new Game(numberOfHexagonsCenterRow, 1);
+
+//		game.setCellToPlayer(1, -2, 2);
+//		game.setCellToPlayer(1, 0, -2);
+//		game.setCellToPlayer(1, 1, -2);
+//		game.setCellToPlayer(1, 2, -2);
+//
+//		game.setCellToPlayer(2, 0, 0);
+//		game.setCellToPlayer(2, -1, 0);
+//		game.setCellToPlayer(2, 0, 1);
+		for(Cell c: game.emptyCells)
+			System.out.println(c.id);
+
 		if(whoPlaysFirst == 1) {
 			playerToPlay = 0;
 			oneSearch();
@@ -47,12 +59,9 @@ public class Main{
 			printGame();
 		playerToPlay = 1;
 
-//		int i = 0;
-
 		player1Move = "";
 		player2Move = "";
 		while(game.isPossibleMoreMoves()) {
-//			i++;
 			System.out.println();
 			System.out.println("The movements of the other player are: ");
 
@@ -75,10 +84,27 @@ public class Main{
 			} else {
 				playerToPlay = 0;
 				Moves.moveConfirmed();
+				game.printUnions();
 				oneSearch();
+				game.printUnions();
 			}
 			printGame();
 		}
+		System.out.println();
+		System.out.println();
+		System.out.println("-------------------------------");
+		System.out.println("GAME FINISHED");
+		long p1 = game.getPunctuation(1);
+		long p2 = game.getPunctuation(2);
+		System.out.println("Player 1 = " +p1+ ".");
+		System.out.println("Player 2 = " +p2+ ".");
+		System.out.println("-------------------------------");
+		System.out.println();
+		System.out.println("THE WINNER IS = " +(p1 > p2 ? 1 : 2)+ ".");
+		System.out.println();
+		System.out.println("-------------------------------");
+		System.out.println();
+		System.out.println();
 		sc.close();
 	}
 	
