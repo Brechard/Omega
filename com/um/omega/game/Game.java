@@ -12,7 +12,6 @@ public class Game {
 	private int group;
 	private long rate;
 	private long punctuation;
-	private Cell[] lastMove;
 	public int playerToPlay;
 	public int playerToRate;
 	public int depth;
@@ -25,6 +24,7 @@ public class Game {
 //		System.out.println();
 //		System.out.println("New game has been created from previous");
 		this.player1 = player1;
+		this.playerToPlay = playerToPlay;
 		this.player2 = player2;
 		this.emptyCells = emptyCells;
 		this.depth = depth;
@@ -82,7 +82,7 @@ public class Game {
 //			System.out.print(c.print());
 //		System.out.println();
 	}
-	public void move_played(int player, Cell cell) {
+	public void uniteMoveConfirmed(int player, Cell cell) {
 		ArrayList<Cell> playerCells = player == 1 ? player1 : player2;
 		
 		for(Cell neighbour: cell.getNeighbours()) {
@@ -104,10 +104,11 @@ public class Game {
 		union2.printUnionFind();
 	}
 	
-	public void move_played(int player, int x, int y) {
-		for(Cell cell: emptyCells) {
+	public void uniteMoveConfirmed(int player, int x, int y) {
+		ArrayList<Cell> playerCells = (player == 1) ? player1 : player2;
+		for(Cell cell: playerCells) {
 			if(cell.equals(x, y)) {
-				move_played(player, cell);
+				uniteMoveConfirmed(player, cell);
 				return;
 			}
 		}
@@ -125,28 +126,32 @@ public class Game {
 	 * @return
 	 */
 	public long calculateRate(int player){
+		rate = (player == 1) ? union1.getCount() : union2.getCount();
+		return rate;
+	}
+		
+//		alreadyCounted = new ArrayList<>();
+//		group = 0;
+//		rate = 1;
+//		ArrayList<Cell> playerCells = (player == 1) ? player1 : player2;
+//
+//		playerCells.stream().filter(cell -> !alreadyCounted.contains(cell)).forEach(
+//				cell -> {
+//					group = 1;
+//					alreadyCounted.add(cell);
+//					searchNeighbor(cell, playerCells);
+//					rate = rate * group;
 
-		alreadyCounted = new ArrayList<>();
-		group = 0;
-		rate = 1;
-		ArrayList<Cell> playerCells = (player == 1) ? player1 : player2;
-
-		playerCells.stream().filter(cell -> !alreadyCounted.contains(cell)).forEach(
-				cell -> {
-					group = 1;
-					alreadyCounted.add(cell);
-					searchNeighbor(cell, playerCells);
-					rate = rate * group;
 //					if(group > 3)
 //						rate -= (group - 3) * 3;
 
 //					System.out.print("Player: " +player+ ", finish with the point: " +cell.getPointString()+ " RN the group count is: " +group);
 //					System.out.println(", and the rate count is: " +rate);
-				}
-			);
-
-		return rate;
-	}
+//				}
+//			);
+//
+//		return rate;
+//	}
 	
 	/**
 	 * Calculates the punctuation of a player
@@ -183,12 +188,18 @@ public class Game {
 				);		
 	}
 	
-	public boolean isPossibleMoreMoves() {
+	public boolean isPossibleMoreRounds() {
 		return emptyCells.isEmpty() ? 
-				true : 
+ 				false : 
 				emptyCells.size() > 4;
 	}
-	
+
+	public boolean isPossibleMoreMoves() {
+		return emptyCells.isEmpty() ? 
+ 				false : 
+				emptyCells.size() > 2;
+	}
+
 	public void createNeighbours() {
 		ArrayList<Cell> cellsToSearch = new ArrayList<>(emptyCells);
 		for(Cell c: emptyCells) {
@@ -203,7 +214,7 @@ public class Game {
 	}
 	
 	/**
-	 * This method is used internally and therefore the changes are added to the history
+	 * This method is used internally and by for the AI moves, therefore the changes are added to the history
 	 * @param player
 	 * @param cell
 	 */
@@ -214,7 +225,7 @@ public class Game {
 		emptyCells.remove(cell);
 		if(player == 1) player1.add(cell);
 		else player2.add(cell);
-		move_played(player, cell);
+		uniteMoveConfirmed(player, cell);
 		playHistory += "(" +player+ ", " +cell.x+ ", " +cell.y+ ").";
 	}
 	
@@ -228,11 +239,11 @@ public class Game {
 	public void setCellToPlayer(int player, int x, int y) throws Error{
 		for(Cell cell: emptyCells) {
 			if(cell.equals(x, y)) {
-				move_played(player, x, y);
 				emptyCells.remove(cell);
 				if(player == 1) player1.add(cell);
 				else player2.add(cell);
-				move_played(player, cell);
+//				uniteMoveConfirmed(player, cell);
+
 //				playHistory += "(" +player+ ", " +cell.x+ ", " +cell.y+ ").";
 				return;
 			}
@@ -243,11 +254,10 @@ public class Game {
 	public void deleteMove(int player, int x, int y) {
 //		System.out.println("Delete from the player " +player+ " (" +x+ ", " +y+")");
 		ArrayList<Cell> playerList = (player == 1) ? player1 : player2;
-//		System.out.println("Size" +playerList.size());
 		
 		for(Cell cell: playerList) {
 			if(cell.equals(x, y)) {
-				System.out.println("Deleted cell: " +cell.print()+ " of player ");
+				System.out.println("Deleted cell: " +cell.print()+ " of player "+ player);
 				playerList.remove(cell);
 				emptyCells.add(cell);
 				return;

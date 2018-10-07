@@ -8,26 +8,32 @@ import Helpers.Flag;
 public class SearchAlgorithms {
 
 	private static HashMap<Long, TTInfo> hashMap = new HashMap<Long, TTInfo>();
+	
+	public static void cleanHashMap() {
+		hashMap = new HashMap<Long, TTInfo>();
+	}
 
 	public static String[] aspirationSearch(Game game, int delta, int maxDepth) {
+//		System.out.println("Start the search, the playerToPlay is: " +game.playerToPlay+ " the startPlayer is: " +Main.gameController.getFirstPlayer());
+//		System.out.println("Is it possible to keep playing?" +(game.emptyCells.size() < 4)+ " and " +(game.playerToPlay == Main.gameController.getFirstPlayer()));
 		String[] result = null;
 		for(int depth = 1; depth <= maxDepth; depth++ ) {
 			long alpha = - delta; 
 			long beta = + delta;
 			result = alphaBetaWithTT(game, depth, alpha, beta);
-			long score = Integer.valueOf(result[0]);
+			long score = Long.valueOf(result[0]);
 			if( score >= beta ) {
 				alpha = score; 
 				beta = (long) Long.MAX_VALUE;
 				System.out.println("Failed high " +depth+ " alpha: " +alpha+ " beta: " +beta);
 				result = alphaBetaWithTT(game, depth, alpha, beta);
-				score = Integer.valueOf(result[0]);
+				score = Long.valueOf(result[0]);
 			} else if( score <= alpha ) {
 				alpha  = (long) Long.MIN_VALUE;
 				beta = score;
 				System.out.println("Failed low " +depth+ " alpha: " +alpha+ " beta: " +beta);
 				result = alphaBetaWithTT(game, depth, alpha, beta);
-				score = Integer.valueOf(result[0]);
+				score = Long.valueOf(result[0]);
 			}
 			System.out.println("Search in depth " +depth+ " alpha: " +alpha+ " beta: " +beta);
 		}
@@ -36,7 +42,7 @@ public class SearchAlgorithms {
 
 	public static String[] alphaBeta(Game game, int depth, int alpha, int beta) {
 //		numberOfSearches++;
-//		System.out.println("The game observed now is: " +game.playHistory);
+		
 		if(!game.isPossibleMoreMoves() || depth == 0) {
 //			long h = game.getHash();
 //			if(hashes.contains(h))
@@ -81,6 +87,11 @@ public class SearchAlgorithms {
 				return gameInfo.getInfo();
 		}
 //		System.out.println("Hash not found: " +game.getHash());
+		
+//		System.out.println();
+//		System.out.println("In depth " +depth+ " is it possible to keep playing?" +(game.emptyCells.size() < 4)+ " and " 
+//				+(game.playerToPlay == Main.gameController.getFirstPlayer()));
+//		System.out.println("The playerToPlay is: " +game.playerToPlay+ " the startPlayer is: " +Main.gameController.getFirstPlayer());
 
 //		numberOfSearches++;
 //		System.out.println("The game observed now is: " +game.playHistory);
@@ -92,12 +103,14 @@ public class SearchAlgorithms {
 			return new String[] {String.valueOf(game.getRate()), game.getPlayHistory()};
 		}
 		
-		long score = (long) -999999999;
+		long score = Long.MIN_VALUE;
 
 		String[] valueToReturn = new String[] {String.valueOf(score), ""};
 		String[] valueHelper = new String[] {String.valueOf(score), ""};
 		ArrayList<Game> childGames = game.possibleGames();
 		long value;
+		if(childGames.size() == 0)
+			System.out.println("------------------------------------- " +game.getPlayHistory());
 		for(int child = 0; child < childGames.size(); child++) {
 			valueHelper = alphaBetaWithTT(childGames.get(child), depth -1,(long) -beta,(long) -alpha);
 			value = -Long.valueOf(valueHelper[0]);

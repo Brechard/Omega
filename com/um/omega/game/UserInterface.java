@@ -11,6 +11,7 @@ import java.util.ArrayList;
 
 import javax.swing.JPanel;
 
+import Helpers.GameController;
 import Helpers.Moves;
 import Helpers.Parsers;
 
@@ -23,14 +24,16 @@ public class UserInterface extends JPanel implements MouseListener{
 	private static int numberHexMiddleRow;
 	private static Game game;
 	private static ArrayList<Hexagon> grid = new ArrayList<>();
+	private static GameController gameController;
 //	private static int x = 0;
 //	private static int y = 0;
 	
-	public UserInterface(int boardSize, int size, Game game) {
+	public UserInterface(int boardSize, int size, Game game, GameController gameController) {
 		
 		this.boardSize = boardSize;
 		this.numberHexMiddleRow = size * 2 - 1;
 		this.game = game;
+		this.gameController = gameController;
         addMouseListener(this);
 	}
 		
@@ -86,21 +89,16 @@ public class UserInterface extends JPanel implements MouseListener{
 	@Override
 	public void mouseClicked(MouseEvent e) {
 
-		if(Main.playerToPlay != 0) {
-			System.out.println("Click " +e.getX()+ "," +e.getY());
+		if(!gameController.isAIturn()) {
 			for(Hexagon h: grid) {
 				if(h.contains(e.getX(), e.getY())) {
-					String pos = "(" +h.getxCubePosition()+ "," + h.getyCubePosition() +")";
-					System.out.println("The cell clicked is: " +pos);
-					boolean insertData = Parsers.parseMove(Main.playerToPlay, pos);
-					if(!insertData) {
-						Moves.setPlayerMove(pos);
-						Moves.played();
-					}
-					break;
+					String move = "(" +h.getxCubePosition()+ "," + h.getyCubePosition() +")";
+					System.out.println("The cell clicked is: " +move);
+					gameController.moveMade(h.getxCubePosition(), h.getyCubePosition());
+					return;
 				}
 			}
-			
+			System.out.println("Click " +e.getX()+ "," +e.getY()+ " this is not a cell");			
 		}
 
 	}

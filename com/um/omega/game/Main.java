@@ -1,13 +1,11 @@
 package com.um.omega.game;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Scanner;
 
 import javax.swing.JFrame;
 
-import Helpers.Flag;
+import Helpers.GameController;
 import Helpers.Moves;
 import Helpers.Parsers;
 
@@ -17,15 +15,12 @@ public class Main{
 	public static Game game;
 	public static String gameHistory;
 	public static final int numberOfPlayers = 2;
-	public final static int sizeSideHexagon = 4;
+	public final static int sizeSideHexagon = 3;
 	
 	private final static int depthToSearch = 4;
 	public static int numberOfHexagonsCenterRow;
 	private static JFrame frame = new JFrame("Board");
-	public static int playerToPlay;
-	public static String player1Move;
-	public static String player2Move;
-	
+	public static GameController gameController;
 	// private static int numberOfSearches = 0;
 	// Check Bitboard
 	
@@ -37,56 +32,68 @@ public class Main{
 //		System.out.println("What player plays first? 1 or 2?");
 		
 		System.out.println("What player plays first? The opponent (2) or me (1)?");
-		int whoPlaysFirst = Integer.valueOf(sc.nextLine());
+		int whoPlaysFirst;
+		while(true) {
+			try {
+				whoPlaysFirst = Integer.valueOf(sc.nextLine());							
+				break;
+			} catch (NumberFormatException e) {
+				System.err.println("Error in the input");
+			}
+		}
 		game = new Game(numberOfHexagonsCenterRow, 1);
-
-//		game.setCellToPlayer(1, -2, 2);
-//		game.setCellToPlayer(1, 0, -2);
-//		game.setCellToPlayer(1, 1, -2);
+		gameController = new GameController(game, numberOfPlayers, whoPlaysFirst);
+		
+		game.setCellToPlayer(1, -2, 2);
+		game.setCellToPlayer(1, 0, -2);
+		game.setCellToPlayer(1, 1, -2);
+		game.setCellToPlayer(1, 1, -1);
+		game.setCellToPlayer(1, 1, 0);
 //		game.setCellToPlayer(1, 2, -2);
 //
 //		game.setCellToPlayer(2, 0, 0);
-//		game.setCellToPlayer(2, -1, 0);
-//		game.setCellToPlayer(2, 0, 1);
-		for(Cell c: game.emptyCells)
-			System.out.println(c.id);
-
-		if(whoPlaysFirst == 1) {
-			playerToPlay = 0;
+		game.setCellToPlayer(2, 1, 1);
+		game.setCellToPlayer(2, 2, 0);
+		game.setCellToPlayer(2, -1, 0);
+		game.setCellToPlayer(2, 0, 1);
+		game.setCellToPlayer(2, -1, 1);
+		
+		if(gameController.isAIturn())
 			oneSearch();
-		}
 		else
 			printGame();
-		playerToPlay = 1;
 
-		player1Move = "";
-		player2Move = "";
-		while(game.isPossibleMoreMoves()) {
+		boolean lastRound = false;
+		
+		while(!lastRound) {
+
 			System.out.println();
+			System.out.println("PlayerToMove: " +gameController.getPlayerToMove()+ " it's AI turn? " +gameController.isAIturn());
 			System.out.println("The movements of the other player are: ");
-
 			System.out.println("Player 1 (White, US): ");
-			playerToPlay = 1;
-			while(playerToPlay == 1)
+
+			while(!gameController.isAIturn() && gameController.getPlayerToMove() == 1)
 				try { Thread.sleep(100); } catch (InterruptedException e) { e.printStackTrace();}
 			printGame();
 
 			System.out.println("Player 2 (Black, OPPONENT): ");
-			while(playerToPlay == 2)
+
+			while(!gameController.isAIturn() && gameController.getPlayerToMove() == 2)
 				try { Thread.sleep(100); } catch (InterruptedException e) { e.printStackTrace();}
 			printGame();
 			
 			System.out.println("Is this correct? Yes, No?");
 			String s = sc.nextLine().toUpperCase();
 			if(s.equals("N") || s.equals("No")) {
-				Moves.undoMove(1, player1Move);
-				Moves.undoMove(2, player2Move);
+				gameController.undoMoves();
 			} else {
-				playerToPlay = 0;
-				Moves.moveConfirmed();
-				game.printUnions();
+				lastRound |= gameController.confirmMoves();
+				if(gameController.getFirstPlayer() == 1 && lastRound)
+					break;
 				oneSearch();
-				game.printUnions();
+				lastRound |= !game.isPossibleMoreRounds();
+				if(gameController.getFirstPlayer() == 1 && lastRound)
+					lastRound = false;
 			}
 			printGame();
 		}
@@ -118,8 +125,8 @@ public class Main{
 //		String[] result = SearchAlgorithms.alphaBetaWithTT(game, depthToSearch, -99999999, 99999999);
 		long  endTime = System.currentTimeMillis();
 		System.out.println("Response: " +Arrays.asList(result));
-		Parsers.parseGameDebug(result[1]);
-		Parsers.parseNextMove(result[1]);
+//		Parsers.parseGameDebug(result[1], new UserInterface(boardSize, numberOfHexagonsCenterRow, game, gameController));
+		gameController.movesForAI(result[1]);
 		System.out.println("Player 1 = " +game.getPunctuation(1)+ ".");
 		System.out.println("Player 2 = " +game.getPunctuation(2)+ ".");
 //		System.out.println("The history of the game is: "+result[1]);
@@ -146,7 +153,8 @@ public class Main{
 		for(int i = 0; i < n; i++) {
 //			numberOfSearches = 0;
 			startTime = System.currentTimeMillis();
-			SearchAlgorithms.alphaBetaWithTT(game, depthToSearch, -99999999, 99999999);
+			SearchAlgorithms.aspirationSearch(game, 10, depthToSearch);		
+			SearchAlgorithms.cleanHashMap();
 			endTime = System.currentTimeMillis();
 			duration = (endTime - startTime) * 0.001;  
 			minutes = (int) duration/60;
@@ -156,13 +164,13 @@ public class Main{
 		}
 		double avg = totalDuration / n;
 		minutes = (int) avg/60;
-		System.out.println("Doing " +n+ " searches, the averga time was: " +avg+ ", meaning: " +minutes+ " minutes " +(avg - minutes * 60) +" s");
+		System.out.println("Doing " +n+ " searches, the average time was: " +avg+ ", meaning: " +minutes+ " minutes " +(avg - minutes * 60) +" s");
 	}
 	
 
 	
 	public static void printGame() {
-		UserInterface ui = new UserInterface(boardSize, numberOfHexagonsCenterRow, game);
+		UserInterface ui = new UserInterface(boardSize, numberOfHexagonsCenterRow, game, gameController);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.add(ui);
 		frame.setSize(boardSize, boardSize);

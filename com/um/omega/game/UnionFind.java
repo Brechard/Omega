@@ -4,7 +4,6 @@ public class UnionFind {
 
 	private int[] parent;
 	private int[] size;
-	private int count;
 	
 	public UnionFind(int size) {
 		parent = new int[size];
@@ -18,11 +17,11 @@ public class UnionFind {
 	public UnionFind(UnionFind union) {
 		this.parent = union.parent.clone();
 		this.size = union.size.clone();
-		this.count = union.count;
 	}
 	
 	public int getRoot(int i) {
 		while(i != parent[i]) {
+			parent[i]  = parent[parent[i]];
 			i = parent[i];
 		}
 		return i;
@@ -37,7 +36,6 @@ public class UnionFind {
 		int rootQ = getRoot(q);
 		
 		if (rootP == rootQ) return;
-
 //		System.out.println("Union cell " +p+ ", parent: " +rootP+ " with cell " +q+ " parent: " +rootQ);
 //		System.out.println("Size of rootP is " +size[rootP]+ " of rootQ is " +size[rootQ]);
 
@@ -49,6 +47,15 @@ public class UnionFind {
 			size[rootP] += size[rootQ];			
 		}
 	}
+	
+	public long getCount() {
+		long rate = 1;
+		for(int i = 0; i < parent.length; i++) {
+			if(parent[i] == i) // He is the root
+				rate *= size[i];
+		}
+		return rate;
+	}	
 	
 	public void printUnionFind() {
 		for (int i = 0; i < parent.length; i++) {
