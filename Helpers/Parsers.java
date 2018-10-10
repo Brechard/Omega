@@ -14,6 +14,8 @@ public class Parsers {
 	private static String gameHistoryProvisional = "";
 	static JFrame frame = new JFrame("DEBUG BOARD");
 
+	
+	
 	public static void parseNextMove(String s, GameController gameController) {
 		String[] movesReceived = s.split("\\.");
 		ArrayList<String> newMoves = Moves.getMoveToDo(movesReceived, gameController.getGameHistory());

@@ -77,5 +77,8 @@ public class Cell{
     public String print() {
     	return "(" + x + ", " + y + ")";
     }
+    public String printXY() {
+    	return x + ", " + y;
+    }
 
 }

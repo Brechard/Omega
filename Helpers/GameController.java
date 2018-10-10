@@ -1,8 +1,12 @@
 package Helpers;
 
+import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.HashMap;
 
+import com.um.omega.game.Cell;
 import com.um.omega.game.Game;
+import com.um.omega.game.SimpleGame;
 
 public class GameController {
 	
@@ -19,14 +23,28 @@ public class GameController {
 	private Integer[][] moves;
 	private ArrayList<String> gameHistory = new ArrayList<>();
 	private int movesByAI = 0;
-	
-	public GameController(Game game, int numberOfPlayers, int firstPlayer) {
+	private long[] hashes;
+	private SimpleGame simpleGame;
+	private String[] cells;
+	private HashMap<String, Integer> xyToIdMap = new HashMap<>();
+	/**
+	 * It is important to notice that this controller is only used when the game is new
+	 * @param game
+	 * @param simpleGame
+	 * @param numberOfPlayers
+	 * @param firstPlayer
+	 */
+	public GameController(Game game, SimpleGame simpleGame, int numberOfPlayers, int firstPlayer) {
 		this.game = game;
 		this.numberOfPlayers = numberOfPlayers;
 		this.firstPlayer = firstPlayer;
 		this.playerToPlay = firstPlayer;
 		this.moves = new Integer[numberOfPlayers][2];
+		this.simpleGame = simpleGame;
+		calculateHashes(simpleGame.getGame().length);
+		startDictionariesGameSimpleGame(game.emptyCells);
 	}
+	
 	
 	/**
 	 * The AI will always be considered the player 1
@@ -70,7 +88,10 @@ public class GameController {
 	public boolean confirmMoves() {
 		for(int player = 0; player < moves.length; player++) {
 			// The moves are placed in player - 1 because arrays position start in 0
-			game.uniteMoveConfirmed(player + 1, moves[player][0], moves[player][1]);
+			int x = moves[player][0];
+			int y = moves[player][1];
+			game.uniteMoveConfirmed(player + 1, x, y);			
+			simpleGame.makeMove(player + 1, getIdWithXY(x, y));
 			gameHistory.add("(" +(player + 1)+ "," +moves[player][0]+ "," +moves[player][1]+ ")");
 		}
 		playerFinish();
@@ -97,6 +118,33 @@ public class GameController {
 		}
 		clearMoves();
 	}
+	
+	public void calculateHashes(int size) {
+		hashes = new long[size];
+		for(int i = 0; i < size; i++)
+			hashes[i] = new SecureRandom().nextLong();		
+	}
+	
+	public long getHash() {
+		long hash = 0;
+		int[] game = simpleGame.getGame();
+		for(int i = 0; i < game.length; i++)
+			hash ^= hashes[i] * game[i];
+		return hash;
+	}
+	
+	public int getIdWithXY(int x, int y) {
+		return xyToIdMap.get(x+ "," +y);
+	}
+	
+	public void startDictionariesGameSimpleGame(ArrayList<Cell> listCells) {
+		cells = new String[listCells.size()];
+		for(Cell cell: listCells) {
+			cells[cell.id] = cell.printXY();
+			xyToIdMap.put(cell.printXY(), cell.id);
+		}
+	}
+
 
 	/**
 	 * @return the playerToMove

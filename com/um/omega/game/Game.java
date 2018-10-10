@@ -144,7 +144,7 @@ public class Game {
 
 //					if(group > 3)
 //						rate -= (group - 3) * 3;
-
+//
 //					System.out.print("Player: " +player+ ", finish with the point: " +cell.getPointString()+ " RN the group count is: " +group);
 //					System.out.println(", and the rate count is: " +rate);
 //				}
@@ -251,6 +251,21 @@ public class Game {
 		throw new Error("The cell (" +x+", " +y+ ") is not empty");
 	}
 
+	public void setCellToPlayer(int player, int id) throws Error{
+		for(Cell cell: emptyCells) {
+			if(cell.id == id) {
+				emptyCells.remove(cell);
+				if(player == 1) player1.add(cell);
+				else player2.add(cell);
+//				uniteMoveConfirmed(player, cell);
+
+//				playHistory += "(" +player+ ", " +cell.x+ ", " +cell.y+ ").";
+				return;
+			}
+		}
+		throw new Error("The cell with id " +id+ " is not empty");
+	}
+
 	public void deleteMove(int player, int x, int y) {
 //		System.out.println("Delete from the player " +player+ " (" +x+ ", " +y+")");
 		ArrayList<Cell> playerList = (player == 1) ? player1 : player2;
@@ -284,6 +299,15 @@ public class Game {
 											playHistory,
 											union1,
 											union2));
+				possibleGames.add(new Game(new ArrayList<Cell>(player1), 
+						new ArrayList<Cell>(player2), 
+						new ArrayList<Cell>(emptyCells), 
+						new Cell[]{cell2, cell}, 
+						depth + 1,
+						playerToPlay == 1 ? 2 : 1,
+						playHistory,
+						union1,
+						union2));
 			}
 		}
 		return possibleGames;

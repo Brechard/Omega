@@ -5,19 +5,20 @@ import java.util.Scanner;
 
 import javax.swing.JFrame;
 
+import Adapters.GamesAdapter;
 import Helpers.GameController;
-import Helpers.Moves;
-import Helpers.Parsers;
+import Helpers.SimpleGameController;
 
 public class Main{
 	
 	public final static int boardSize = 800;
 	public static Game game;
+	public static SimpleGame simpleGame;
 	public static String gameHistory;
 	public static final int numberOfPlayers = 2;
-	public final static int sizeSideHexagon = 3;
+	public final static int sizeSideHexagon = 6;
 	
-	private final static int depthToSearch = 4;
+	private final static int depthToSearch = 8;
 	public static int numberOfHexagonsCenterRow;
 	private static JFrame frame = new JFrame("Board");
 	public static GameController gameController;
@@ -25,9 +26,72 @@ public class Main{
 	// Check Bitboard
 	
 	public static void main(String[] args) {
+//		Game2 game2 = new Game2(sizeSideHexagon, 1);
+//		game2.setCellToPlayer(1, 34);
+//		game2.setCellToPlayer(1, 2);
+//		game2.setCellToPlayer(2, 1);
+//		game2.setCellToPlayer(2, 0);
+
+		numberOfHexagonsCenterRow = sizeSideHexagon * 2 - 1;
+//		game = new Game(numberOfHexagonsCenterRow, 1);
+//		printGame();
+		simpleGame = new SimpleGame(sizeSideHexagon, 1);
+//		simpleGame.makeMove(1, 0);
+//		simpleGame.makeMove(2, 1);
+//		simpleGame.makeMove(1, 4);
+//		simpleGame.makeMove(2, 7);
+//		simpleGame.makeMove(1, 13);
+//		simpleGame.makeMove(2, 15);
+		SimpleGameController simpleGameController = new SimpleGameController(simpleGame, numberOfPlayers, 1);
+
+		long startTime = System.currentTimeMillis();
+		String[] result = SearchAlgorithms.alphaBetaWithTT(simpleGame, depthToSearch, Long.MIN_VALUE,Long.MAX_VALUE, simpleGameController);
+		long  endTime = System.currentTimeMillis();
+		double duration = (endTime - startTime) * 0.001;  
+		int minutes = (int) duration/60;
+		System.out.println("It took " +minutes+ " minutes " +(duration - minutes * 60) +" s to calculate it.");
+
+		System.out.println(result[0]);
+		System.out.println(result[1]);
+		
+		game = GamesAdapter.getGame(result[1], numberOfHexagonsCenterRow, 1);
+		printGame();
+//		try {
+//			Thread.sleep(100);
+//		} catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+
+//		int i = 1;
+//		for(SimpleGame son: g.possibleGames()) {
+////			System.out.println(Arrays.toString(son.getGame()));
+////			son.printUnions();
+//			Game game = SimpleGameToGame.getGame(son.getGame(), numberOfHexagonsCenterRow, 1);
+//			JFrame frame = new JFrame("Board " +(i++));
+//			UserInterface ui = new UserInterface(boardSize, numberOfHexagonsCenterRow, game, gameController);
+//			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//			frame.add(ui);
+//			frame.setSize(boardSize, boardSize);
+//			frame.setVisible(true);
+//			try {
+//				Thread.sleep(10);
+//			} catch (InterruptedException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
+//		if(true)
+//			return;
+
+//		play();
+
+
+	}
+	
+	public static void play() {
 		gameHistory = "";
 		numberOfHexagonsCenterRow = sizeSideHexagon * 2 - 1;
-		
 		Scanner sc = new Scanner(System.in);
 //		System.out.println("What player plays first? 1 or 2?");
 		
@@ -42,21 +106,7 @@ public class Main{
 			}
 		}
 		game = new Game(numberOfHexagonsCenterRow, 1);
-		gameController = new GameController(game, numberOfPlayers, whoPlaysFirst);
-		
-		game.setCellToPlayer(1, -2, 2);
-		game.setCellToPlayer(1, 0, -2);
-		game.setCellToPlayer(1, 1, -2);
-		game.setCellToPlayer(1, 1, -1);
-		game.setCellToPlayer(1, 1, 0);
-//		game.setCellToPlayer(1, 2, -2);
-//
-//		game.setCellToPlayer(2, 0, 0);
-		game.setCellToPlayer(2, 1, 1);
-		game.setCellToPlayer(2, 2, 0);
-		game.setCellToPlayer(2, -1, 0);
-		game.setCellToPlayer(2, 0, 1);
-		game.setCellToPlayer(2, -1, 1);
+		gameController = new GameController(game, simpleGame, numberOfPlayers, whoPlaysFirst);
 		
 		if(gameController.isAIturn())
 			oneSearch();
@@ -107,7 +157,7 @@ public class Main{
 		System.out.println("Player 2 = " +p2+ ".");
 		System.out.println("-------------------------------");
 		System.out.println();
-		System.out.println("THE WINNER IS = " +(p1 > p2 ? 1 : 2)+ ".");
+		System.out.println("THE WINNER IS PLAYER = " +(p1 > p2 ? 1 : 2)+ ".");
 		System.out.println();
 		System.out.println("-------------------------------");
 		System.out.println();
