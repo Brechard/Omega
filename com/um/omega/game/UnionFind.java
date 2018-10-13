@@ -36,6 +36,7 @@ public class UnionFind {
 		int rootQ = getRoot(q);
 		
 		if (rootP == rootQ) return;
+
 //		System.out.println("Union cell " +p+ ", parent: " +rootP+ " with cell " +q+ " parent: " +rootQ);
 //		System.out.println("Size of rootP is " +size[rootP]+ " of rootQ is " +size[rootQ]);
 
@@ -50,11 +51,15 @@ public class UnionFind {
 	
 	public long getCount() {
 		long rate = 1;
+		long bigGroups = 0;
 		for(int i = 0; i < parent.length; i++) {
-			if(parent[i] == i) // He is the root
+			if(parent[i] == i) { // He is the root
 				rate *= size[i];
+				if(size[i] != 1)
+					bigGroups += Math.abs(size[i] - 3);
+			}
 		}
-		return rate;
+		return rate - bigGroups;
 	}	
 	
 	public void printUnionFind() {

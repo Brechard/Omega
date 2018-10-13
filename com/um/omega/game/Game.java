@@ -2,6 +2,7 @@ package com.um.omega.game;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 
 public class Game {
 
@@ -56,6 +57,7 @@ public class Game {
 //            	int r = empty > 4 ? new Random().nextInt(2) + 1 : new Random().nextInt(3);
 //            	if(r == 0) {
             		emptyCells.add(new Cell(row < half ? col - row : col - half, row - half, emptyCells.size()));
+            		
 //            		empty++;
 //            	}
 //            	else if(r == 1)
@@ -200,17 +202,24 @@ public class Game {
 				emptyCells.size() > 2;
 	}
 
-	public void createNeighbours() {
+	public ArrayList<HashSet<Integer>> createNeighbours() {
 		ArrayList<Cell> cellsToSearch = new ArrayList<>(emptyCells);
+		ArrayList<HashSet<Integer>> neighbours = new ArrayList<>();
+		for(int i = 0; i < emptyCells.size(); i++) {
+			neighbours.add(i, new HashSet<Integer>());			
+		}
 		for(Cell c: emptyCells) {
 			cellsToSearch.remove(c);
 			for(Cell c1: cellsToSearch) {
 				if(c.isNeighbour(c1)) {
+					neighbours.get(c.id).add(c1.id);						
+					neighbours.get(c1.id).add(c.id);
 					c.addNeighbour(c1);
 					c1.addNeighbour(c);
 				}
 			}
 		}
+		return neighbours;
 	}
 	
 	/**
@@ -259,7 +268,7 @@ public class Game {
 				else player2.add(cell);
 //				uniteMoveConfirmed(player, cell);
 
-//				playHistory += "(" +player+ ", " +cell.x+ ", " +cell.y+ ").";
+				playHistory += "(" +player+ ", " +cell.x+ ", " +cell.y+ ").";
 				return;
 			}
 		}
@@ -281,38 +290,6 @@ public class Game {
 		
 	}
 	
-	public ArrayList<Game> possibleGames() {
-			
-		ArrayList<Game> possibleGames = new ArrayList<>();
-		ArrayList<Cell> newEmptyCells;
-		for(Cell cell: emptyCells) {
-			newEmptyCells = new ArrayList<Cell>(emptyCells);
-			newEmptyCells.remove(cell);
-			for(Cell cell2: newEmptyCells) {
-//				System.out.println("We are going to create a new game with: Player 1: " +cell.print()+ ", player 2: " +cell2.print());
-				possibleGames.add(new Game(new ArrayList<Cell>(player1), 
-											new ArrayList<Cell>(player2), 
-											new ArrayList<Cell>(emptyCells), 
-											new Cell[]{cell, cell2}, 
-											depth + 1,
-											playerToPlay == 1 ? 2 : 1,
-											playHistory,
-											union1,
-											union2));
-				possibleGames.add(new Game(new ArrayList<Cell>(player1), 
-						new ArrayList<Cell>(player2), 
-						new ArrayList<Cell>(emptyCells), 
-						new Cell[]{cell2, cell}, 
-						depth + 1,
-						playerToPlay == 1 ? 2 : 1,
-						playHistory,
-						union1,
-						union2));
-			}
-		}
-		return possibleGames;
-	}
-	
 	/**
 	 * @return the playHistory
 	 */
@@ -325,15 +302,5 @@ public class Game {
 	 */
 	public void setPlayHistory(String playHistory) {
 		this.playHistory = playHistory;
-	}
-
-	public long getHash() {
-		long hash = 0;
-		for(Cell c: player1)
-			hash ^= c.hash;
-		hash *= 2;
-		for(Cell c: player2)
-			hash ^= c.hash;
-		return hash;
 	}
 }

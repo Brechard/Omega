@@ -19,7 +19,7 @@ public class Hexagon extends Polygon {
     private int xCubePosition;
     private int yCubePosition;
     private int zCubePosition;
-    
+    private int id;
     public Hexagon(Cell center, int radius) {
         npoints = SIDES;
         xpoints = new int[SIDES];
@@ -31,11 +31,16 @@ public class Hexagon extends Polygon {
         updatePoints();
     }
 
-    public Hexagon(int x, int y, int radius, int xCubePosition, int yCubePositino, int zCubePosition) {
+    public Hexagon(int x, int y, int radius, int xCubePosition, int yCubePositino, int zCubePosition, int id) {
         this(new Cell(x, y), radius);
         this.setxCubePosition(xCubePosition);
         this.setyCubePosition(yCubePositino);
         this.setzCubePosition(zCubePosition);
+        this.id = id;
+    }
+    
+    public int getId() {
+    	return id;
     }
 
     public int getRadius() {

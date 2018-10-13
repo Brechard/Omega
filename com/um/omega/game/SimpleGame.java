@@ -64,25 +64,45 @@ public class SimpleGame {
 		moveConfirmed(player, cellId);
 	}
 	
+	public void moveConfirmed(int player, int cellId) {
+		if(player == 1)
+//			hasNeighbours(player, cellId, union1);
+//		else
+//			hasNeighbours(player, cellId, union2);
+			union1 = SimpleGameHelpers.searchNeighbourForUnionFind(cellId, union1, game, numberOfHexagonsSide);
+		else union2 = SimpleGameHelpers.searchNeighbourForUnionFind(cellId, union2, game, numberOfHexagonsSide);
+		playHistory += player+ "," +cellId+ ".";
+	}
+	
+//	public void hasNeighbours(int player, int cellId, UnionFind unionFind) {
+//		for(Integer cell2Id: Main.gameController.getNeighbours(cellId)) {
+//			if(game[cell2Id] == player)
+//				unionFind.unite(cellId, cell2Id);
+//		}
+//	}
+
+	
 	public void deleteMove(int cellId) {
 		game[cellId] = 0;
 	}
 	
 	public long getRate() {
-		return playerToPlay == 1 ? union1.getCount() : union2.getCount();
+		return playerToPlay == 1 ? union1.getCount(): union2.getCount();
+//		return union1.getCount() - union2.getCount();
 	}
 	
 	public ArrayList<SimpleGame> possibleGames() {
 		ArrayList<SimpleGame> possibleGames = new ArrayList<>();
-		for(int i = 0; i < game.length - 1; i++) {
+		for(int i = 0; i < game.length; i++) {
 			if(game[i] == 0) { // The Cell is empty
+
 				possibleGames.add(new SimpleGame(numberOfHexagonsSide, 
-					playerToMove == 1 ? (playerToPlay == 1? 2 : 1) : playerToMove,
-					game, 
-					new int[] {playerToMove, i},
-					new UnionFind[] {union1, union2},
-					playHistory, 
-					playerToMove == 1 ? 2 : 1));
+						playerToMove == 2 ? (playerToPlay == 2 ? 1 : 2) : playerToPlay,
+								game, 
+								new int[] {playerToMove, i},
+								new UnionFind[] {union1, union2},
+								playHistory, 
+								playerToMove == 1 ? 2 : 1));
 				
 //				for(int j = i + 1; j < game.length; j++) {
 //					if(game[j] == 0) {
@@ -104,14 +124,7 @@ public class SimpleGame {
 		}
 		return possibleGames;
 	}
-	
-	public void moveConfirmed(int player, int cellId) {
-		if(player == 1)
-			union1 = SimpleGameHelpers.searchNeighbourForUnionFind(cellId, union1, game, numberOfHexagonsSide);
-		else union2 = SimpleGameHelpers.searchNeighbourForUnionFind(cellId, union2, game, numberOfHexagonsSide);
-		playHistory += player+ "," +cellId+ ".";
-	}
-	
+		
 	public int[] getGame() {
 		return game;
 	}
@@ -152,6 +165,18 @@ public class SimpleGame {
 
 	public String getPlayHistory() {
 		return playHistory;
+	}
+	
+	public int getPlayerToPlay() {
+		return playerToPlay;
+	}
+
+	public void setPlayerToPlay(int player) {
+		playerToPlay = player;
+	}
+	
+	public int getPlayerToMove() {
+		return playerToMove;
 	}
 }
 

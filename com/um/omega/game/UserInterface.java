@@ -25,6 +25,7 @@ public class UserInterface extends JPanel implements MouseListener{
 	private static Game game;
 	private static ArrayList<Hexagon> grid = new ArrayList<>();
 	private static GameController gameController;
+	private static int cellId = 0;
 //	private static int x = 0;
 //	private static int y = 0;
 	
@@ -65,7 +66,7 @@ public class UserInterface extends JPanel implements MouseListener{
 
 		int posX = (int) (origin.x + xOff * (cell.x*2 + cell.y));
 		int posY = (int) (origin.y + yOff * cell.y * 3);
-		Hexagon hex = new Hexagon(posX, posY, boardSize / numberHexMiddleRow, cell.x, cell.y, - cell.x - cell.y);
+		Hexagon hex = new Hexagon(posX, posY, boardSize / numberHexMiddleRow, cell.x, cell.y, - cell.x - cell.y, cellId++);
 		hex.draw((Graphics2D) g, posX, posY, 4, 0xCCCCCC, false);
 		hex.draw((Graphics2D) g, posX, posY, 4, getColor(player), true);
 //		System.out.println("Draw: " +cell.getPointString()+ ", player: " +player);
@@ -94,7 +95,7 @@ public class UserInterface extends JPanel implements MouseListener{
 				if(h.contains(e.getX(), e.getY())) {
 					String move = "(" +h.getxCubePosition()+ "," + h.getyCubePosition() +")";
 					System.out.println("The cell clicked is: " +move);
-					gameController.moveMade(h.getxCubePosition(), h.getyCubePosition());
+					gameController.moveMade(h.getxCubePosition(), h.getyCubePosition(), h.getId());
 					return;
 				}
 			}

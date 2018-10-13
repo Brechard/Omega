@@ -3,7 +3,6 @@ package Helpers;
 import com.um.omega.game.UnionFind;
 
 public class SimpleGameHelpers {
-
 	public static UnionFind searchNeighbourForUnionFind(int cellId, UnionFind unionFind, int[] game, int numberOfHexagonsSide) {
 		int player = game[cellId];
 		if(cellId == 0) { // TOP_LEFT_CORNER
@@ -17,7 +16,7 @@ public class SimpleGameHelpers {
 		}
 		
 		if(cellId < numberOfHexagonsSide - 1) { // TOP_SIDE
-			if(player == cellId - 1)
+			if(player == game[cellId - 1])
 				unionFind.unite(cellId, cellId - 1);
 			if(player == game[cellId + 1])
 				unionFind.unite(cellId, cellId + 1);
@@ -197,7 +196,10 @@ public class SimpleGameHelpers {
 		}
 		throw new Error("Cell not found to check if it's neighbour");
 	}
-	
+
+	/*
+	 * Method created only to check that the procedure is correct before creating searchNeighbourForUnionFind
+	 */
 	public static boolean isNeighbour(int cellId, int checkCellId, int numberOfHexagonsSide) {
 		if(cellId == 0) { // TOP_LEFT_CORNER
 			if(checkCellId == 1 
@@ -346,6 +348,9 @@ public class SimpleGameHelpers {
 		throw new Error("Cell not found to check if neighbour");
 	}
 	
+	/*
+	 * Method created only to check that the procedure is correct before creating isNeighbour
+	 */
 	public static CellType getTypeCell(int cellId, int numberOfHexagonsSide) {
 		if(cellId == 0)
 			return CellType.TOP_LEFT_CORNER;

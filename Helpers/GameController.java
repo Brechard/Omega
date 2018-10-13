@@ -3,6 +3,7 @@ package Helpers;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import com.um.omega.game.Cell;
 import com.um.omega.game.Game;
@@ -20,15 +21,17 @@ public class GameController {
 	private final int numberOfPlayers;
 	private final int firstPlayer;
 	private Game game;
+	// For each player there is the information of the move, [x, y, id]
 	private Integer[][] moves;
 	private ArrayList<String> gameHistory = new ArrayList<>();
 	private int movesByAI = 0;
 	private long[] hashes;
 	private SimpleGame simpleGame;
-	private String[] cells;
+	private String[] cellsIdToXY;
 	private HashMap<String, Integer> xyToIdMap = new HashMap<>();
+	private ArrayList<HashSet<Integer>> idNeighbours;
 	/**
-	 * It is important to notice that this controller is only used when the game is new
+	 * Creation of everything needed to control the game and simpleGame
 	 * @param game
 	 * @param simpleGame
 	 * @param numberOfPlayers
@@ -42,7 +45,11 @@ public class GameController {
 		this.moves = new Integer[numberOfPlayers][2];
 		this.simpleGame = simpleGame;
 		calculateHashes(simpleGame.getGame().length);
-		startDictionariesGameSimpleGame(game.emptyCells);
+		ArrayList<Cell> allCells = new ArrayList<Cell>(game.emptyCells);
+		allCells.addAll(game.player1);
+		allCells.addAll(game.player2);
+		startDictionariesGameSimpleGame(allCells);
+		idNeighbours = game.createNeighbours();
 	}
 	
 	
@@ -54,11 +61,11 @@ public class GameController {
 		return playerToPlay == 1;
 	}
 	
-	public void movesForAI(String s) {
-		Parsers.parseNextMove(s, this);
+	public void movesForAI(String simpleGameMoves) {
+		Parsers.parseNextMove(Parsers.parseSimpleGameMovesToGame(simpleGameMoves, this), this);
 	}
 
-	public void moveAI(int player, int x, int y) {
+	public void moveAI(int player, int x, int y, int cellId) {
 		try{
 			game.setCellToPlayer(player, x, y);
 		} catch (Error e) {
@@ -66,20 +73,21 @@ public class GameController {
 			return;
 		}
 		game.uniteMoveConfirmed(player, x, y);
-		gameHistory.add("(" +player+ "," +x+ "," +y+ ")");
+		simpleGame.makeMove(player, cellId);
+		gameHistory.add("(" +player+ ", " +x+ ", " +y+ ", " +cellId+")");
 		movesByAI++;
 		if(movesByAI == numberOfPlayers)
 			playerFinish();
 	}
-		
-	public void moveMade(int x, int y) {
+	
+	public void moveMade(int x, int y, int id) {
 		try{
 			game.setCellToPlayer(playerToMove, x, y);
 		} catch (Error e) {
 			System.err.println(e+ ", cell already in use");
 			return;
 		}
-		moves[playerToMove - 1] = new Integer[]{x, y};
+		moves[playerToMove - 1] = new Integer[]{x, y, id};
 		playerToMove++;
 		if(playerToMove > numberOfPlayers)
 			playerToMove = 1;
@@ -90,9 +98,12 @@ public class GameController {
 			// The moves are placed in player - 1 because arrays position start in 0
 			int x = moves[player][0];
 			int y = moves[player][1];
-			game.uniteMoveConfirmed(player + 1, x, y);			
-			simpleGame.makeMove(player + 1, getIdWithXY(x, y));
-			gameHistory.add("(" +(player + 1)+ "," +moves[player][0]+ "," +moves[player][1]+ ")");
+			game.uniteMoveConfirmed(player + 1, x, y);
+			simpleGame.makeMove(player + 1, moves[player][2]);
+			gameHistory.add("(" +(player + 1)+ ", " 
+								+moves[player][0]+ ", " 
+								+moves[player][1]+ ", " 
+								+moves[player][2]+ ")");
 		}
 		playerFinish();
 		System.out.println();
@@ -107,6 +118,7 @@ public class GameController {
 		playerToPlay++;
 		if(playerToPlay > numberOfPlayers)
 			playerToPlay = 1;		
+		simpleGame.setPlayerToPlay(playerToPlay);
 		clearMoves();
 	}
 	
@@ -132,25 +144,46 @@ public class GameController {
 			hash ^= hashes[i] * game[i];
 		return hash;
 	}
+
+	public long getHash(int[] game) {
+		long hash = 0;
+		for(int i = 0; i < game.length; i++)
+			hash ^= hashes[i] * game[i];
+		return hash;
+	}
 	
-	public int getIdWithXY(int x, int y) {
-		return xyToIdMap.get(x+ "," +y);
+	/**
+	 * Get the coordinates x and y of a cell given its Id
+	 * @param id
+	 * @return "x,y"
+	 */
+	public String getXYFromId(int id) {
+		return cellsIdToXY[id];
 	}
 	
 	public void startDictionariesGameSimpleGame(ArrayList<Cell> listCells) {
-		cells = new String[listCells.size()];
+		cellsIdToXY = new String[listCells.size()];
 		for(Cell cell: listCells) {
-			cells[cell.id] = cell.printXY();
+			cellsIdToXY[cell.id] = cell.printXY();
 			xyToIdMap.put(cell.printXY(), cell.id);
 		}
 	}
-
+	
+	public HashSet<Integer> getNeighbours(int cellId) {
+//		System.out.println("Cellid "+ cellId+ " " +idNeighbours.toString());
+//		System.out.println("Size " +idNeighbours.size());
+		return idNeighbours.get(cellId);
+	}
 
 	/**
 	 * @return the playerToMove
 	 */
 	public int getPlayerToMove() {
 		return playerToMove;
+	}
+	
+	public int getPlayerToPlay() {
+		return playerToPlay;
 	}
 
 	public void clearMoves() {
