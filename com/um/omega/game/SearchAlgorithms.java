@@ -41,11 +41,11 @@ public class SearchAlgorithms {
 			long alpha = - delta; 
 			long beta = + delta;
 			numberOfSearches = 0;
-//			initiateMovesMade(movesMade.length);
+			initiateMovesMade(movesMade.length);
 			newResult = alphaBetaWithTT(game, depth, alpha, beta, gameController, getOrderedMovesMade());
 			long score = Long.valueOf(newResult[0]);
-			System.out.println("For depth " +depth+ " the result is: " +Arrays.toString(newResult));
-			if(newResult[1] == null || newResult[1] == "" || (result != null && newResult[1].length() <= result[1].length())) {
+//			System.out.println("For depth " +depth+ " the result is: " +Arrays.toString(newResult));
+			if(newResult[1] == null || newResult[1] == "" || (result != null && newResult[1].length() < result[1].length())) {
 				System.out.println("For depth " +depth+ " the result is an error");
 				break;
 			}
@@ -63,11 +63,11 @@ public class SearchAlgorithms {
 				result = alphaBetaWithTT(game, depth, alpha, beta, gameController, getOrderedMovesMade());
 				score = Long.valueOf(result[0]);
 			}
-			System.out.println("Search in depth " +depth+ " alpha: " +alpha+ " beta: " +beta);
-			System.out.println("-------");
-			for(int[] i: SearchAlgorithms.getOrderedMovesMade())
-				System.out.println(Arrays.toString(i));
-			System.out.println("-------");
+//			System.out.println("Search in depth " +depth+ " alpha: " +alpha+ " beta: " +beta);
+//			System.out.println("-------");
+//			for(int[] i: SearchAlgorithms.getOrderedMovesMade())
+//				System.out.println(Arrays.toString(i));
+//			System.out.println("-------");
 		}
 		counterThread.stop();
 		return result;

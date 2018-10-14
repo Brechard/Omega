@@ -14,9 +14,9 @@ public class Main{
 	public static Game game;
 	public static SimpleGame simpleGame;
 	public static final int numberOfPlayers = 2;
-	public final static int sizeSideHexagon = 3;
+	public final static int sizeSideHexagon = 5;
 	
-	private static int depthToSearch = 7;
+	private static int depthToSearch = 2;
 	public static int numberOfHexagonsCenterRow;
 	private static JFrame frame = new JFrame("Board");
 	public static GameController gameController;
@@ -28,6 +28,7 @@ public class Main{
 		numberOfHexagonsCenterRow = sizeSideHexagon * 2 - 1;
 
 		play();
+//		playAIvsAI();
 //		debug();
 //		simpleGame = new SimpleGame(sizeSideHexagon, 1);
 //		int[][] bestPlays = new int[simpleGame.getGame().length][2];
@@ -59,6 +60,25 @@ public class Main{
 //			
 //		}
 	}
+	
+	public static void playAIvsAI() {
+		simpleGame = new SimpleGame(sizeSideHexagon, 1);
+		game = new Game(numberOfHexagonsCenterRow, 1);
+		gameController = new GameController(game, simpleGame, numberOfPlayers, 1);
+				
+		while(simpleGame.isPossibleMoreRounds()) {
+
+			oneSearch(gameController);
+			System.out.println("1 done");
+			System.out.println("----");
+			printGame();			
+			oneSearch(gameController);
+			System.out.println("2 done");
+			System.out.println("----");
+			printGame();
+		}
+	}
+
 	
 	public static void play() {
 		numberOfHexagonsCenterRow = sizeSideHexagon * 2 - 1;
@@ -148,19 +168,19 @@ public class Main{
 		System.out.println("Calculating ...");
 		long startTime = System.currentTimeMillis();
 		i++;
-		if(i % 2 == 0)
+		if(i % 4 == 0)
 			depthToSearch++;
 		
 		SearchAlgorithms.initiateMovesMade(simpleGame.getGame().length);
 		String[] result = SearchAlgorithms.aspirationSearch(simpleGame, 10, depthToSearch, gameController, 150);
 
-		for(int[] i: SearchAlgorithms.movesMade) {
-			System.out.println(Arrays.toString(i));
-		}
-		System.out.println("-------");
-		for(int[] i: SearchAlgorithms.getOrderedMovesMade()) {
-			System.out.println(Arrays.toString(i));
-		}
+//		for(int[] i: SearchAlgorithms.movesMade) {
+//			System.out.println(Arrays.toString(i));
+//		}
+//		System.out.println("-------");
+//		for(int[] i: SearchAlgorithms.getOrderedMovesMade()) {
+//			System.out.println(Arrays.toString(i));
+//		}
 			
 //		String[] result = SearchAlgorithms.alphaBetaWithTT(simpleGame, depthToSearch, -99999999, 99999999, gameController, -1);
 //		String[] result = SearchAlgorithms.aspirationSearch(simpleGame, 10, depthToSearch, gameController);		
@@ -174,7 +194,7 @@ public class Main{
 		System.out.println("Response: " +Arrays.asList(result));
 
 		gameController.movesForAI(result[1]);
-		debugPrintSimpleGame(result[1]);
+//		debugPrintSimpleGame(result[1]);
 		System.out.println("Player 1 = " +game.getPunctuation(1)+ ".");
 		System.out.println("Player 2 = " +game.getPunctuation(2)+ ".");
 
