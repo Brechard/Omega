@@ -84,6 +84,7 @@ public class GameController {
 		int id;
 		try{
 			id = game.setCellToPlayer(playerToMove, x, y);
+			System.out.println("The cell ID is: " +id);
 		} catch (Error e) {
 			System.err.println(e+ ", cell already in use");
 			return;

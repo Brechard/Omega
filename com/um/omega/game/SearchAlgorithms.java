@@ -18,7 +18,7 @@ public class SearchAlgorithms {
 	private static boolean calculate = true;
 		
 	public static String[] aspirationSearch(SimpleGame game, int delta, int maxDepth, GameController gameController, final int counter) {
-//		System.out.println("Start the search, the playerToPlay is: " +game.playerToPlay+ " the startPlayer is: " +Main.gameController.getFirstPlayer());
+		System.out.println("Start the search, depth: " +maxDepth+ ", the playerToPlay is: " +game.getPlayerToPlay()+ " the startPlayer is: " +gameController.getFirstPlayer());
 //		System.out.println("Is it possible to keep playing?" +(game.emptyCells.size() < 4)+ " and " +(game.playerToPlay == Main.gameController.getFirstPlayer()));
 		String[] result = null;
 		String[] newResult = null;
@@ -44,7 +44,7 @@ public class SearchAlgorithms {
 			initiateMovesMade(movesMade.length);
 			newResult = alphaBetaWithTT(game, depth, alpha, beta, gameController, getOrderedMovesMade());
 			long score = Long.valueOf(newResult[0]);
-//			System.out.println("For depth " +depth+ " the result is: " +Arrays.toString(newResult));
+			System.out.println("For depth " +depth+ " the result is: " +Arrays.toString(newResult));
 			if(newResult[1] == null || newResult[1] == "" || (result != null && newResult[1].length() < result[1].length())) {
 				System.out.println("For depth " +depth+ " the result is an error");
 				break;

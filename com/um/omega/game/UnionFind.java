@@ -55,12 +55,22 @@ public class UnionFind {
 		for(int i = 0; i < parent.length; i++) {
 			if(parent[i] == i) { // He is the root
 				rate *= size[i];
-//				if(size[i] != 1)
-//					bigGroups += Math.abs(size[i] - 3);
+				if(size[i] != 1)
+					bigGroups += Math.abs(size[i] - 3);
 			}
 		}
 		return rate - bigGroups;
 	}	
+	public long getRealCount() {
+		long rate = 1;
+		for(int i = 0; i < parent.length; i++) {
+			if(parent[i] == i) { // He is the root
+				rate *= size[i];
+			}
+		}
+		return rate;
+	}	
+
 	
 	public void printUnionFind() {
 		for (int i = 0; i < parent.length; i++) {

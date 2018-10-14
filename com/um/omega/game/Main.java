@@ -14,9 +14,9 @@ public class Main{
 	public static Game game;
 	public static SimpleGame simpleGame;
 	public static final int numberOfPlayers = 2;
-	public final static int sizeSideHexagon = 5;
+	public final static int sizeSideHexagon = 4;
 	
-	private static int depthToSearch = 2;
+	private static int depthToSearch = 3;
 	public static int numberOfHexagonsCenterRow;
 	private static JFrame frame = new JFrame("Board");
 	public static GameController gameController;
@@ -27,9 +27,11 @@ public class Main{
 
 		numberOfHexagonsCenterRow = sizeSideHexagon * 2 - 1;
 
-		play();
+//		play();
+		
 //		playAIvsAI();
-//		debug();
+
+		debug();
 //		simpleGame = new SimpleGame(sizeSideHexagon, 1);
 //		int[][] bestPlays = new int[simpleGame.getGame().length][2];
 //		for(int i = 0; i < simpleGame.getGame().length; i++) {
@@ -52,13 +54,31 @@ public class Main{
 	
 	
 	public static void debug() {
-		simpleGame = new SimpleGame(sizeSideHexagon, 1);
+		SimpleGame simpleGameAIis2 = new SimpleGame(sizeSideHexagon, 2);
+		game = new Game(numberOfHexagonsCenterRow, 1);
+		GameController gameControllerAIis2 = new GameController(game, simpleGameAIis2, numberOfPlayers, 1);
+		oneSearch(gameControllerAIis2, simpleGameAIis2);
+		
+		restart(simpleGameAIis2);
+		
+		game = new Game(numberOfHexagonsCenterRow, 1);
+		SimpleGame simpleGameAIis1 = new SimpleGame(sizeSideHexagon, 1);		
+		GameController gameControllerAIis1 = new GameController(game, simpleGameAIis1, numberOfPlayers, 1);
+		oneSearch(gameControllerAIis1, simpleGameAIis1);
+
+//		debugPrintSimpleGame(simpleGameAIis1.getPlayHistory(), gameControllerAIis1);		
+		
 //		for(SimpleGame g: simpleGame.possibleGames()) {
 //			System.out.println(g.getPlayHistory());
 //			for(SimpleGame g1: g.possibleGames())
 //				System.out.println(g1.getPlayHistory());
 //			
 //		}
+	}
+	
+	public static void restart(SimpleGame simpleGame) {
+		depthToSearch = 3;
+		SearchAlgorithms.initiateMovesMade(simpleGame.getGame().length);		
 	}
 	
 	public static void playAIvsAI() {
@@ -136,7 +156,6 @@ public class Main{
 				System.out.println(Arrays.toString(simpleGame.getGame()));
 				System.out.println("---- PlayerToPlay (gameController):  " +gameController.getPlayerToPlay()+ " simpleGame: " +simpleGame.getPlayerToPlay());
 				oneSearch(gameController);
-				if(depthToSearch < 14) depthToSearch += 2;
 				SearchAlgorithms.numberOfSearches = 0;
 				System.out.println("--------- PlayerToPlay (gameController):  " +gameController.getPlayerToPlay()+ " simpleGame: " +simpleGame.getPlayerToPlay());
 				lastRound |= !game.isPossibleMoreRounds();
@@ -162,17 +181,23 @@ public class Main{
 		System.out.println();
 		sc.close();
 	}
-	public static int i = -2;
-	public static void oneSearch(GameController gameController) {
+	public static int i = 0;
+	public static void oneSearch(GameController gameController) {}
+
+	public static void oneSearch(GameController gameController, SimpleGame simpleGame) {
 		System.out.println();
 		System.out.println("Calculating ...");
 		long startTime = System.currentTimeMillis();
-		i++;
-		if(i % 4 == 0)
-			depthToSearch++;
+
+//		i++;
+//		System.out.println("Is "+i+" even? " +((i & 1) == 0)+ " depth: " +depthToSearch);
+//		if((i & 1) == 0) {
+//			depthToSearch++;
+//			System.out.println("DEPTH AUGMENTED TO "+depthToSearch);
+//		}
 		
 		SearchAlgorithms.initiateMovesMade(simpleGame.getGame().length);
-		String[] result = SearchAlgorithms.aspirationSearch(simpleGame, 10, depthToSearch, gameController, 150);
+		String[] result = SearchAlgorithms.aspirationSearch(simpleGame, 10, depthToSearch, gameController, 12000);
 
 //		for(int[] i: SearchAlgorithms.movesMade) {
 //			System.out.println(Arrays.toString(i));
@@ -194,7 +219,7 @@ public class Main{
 		System.out.println("Response: " +Arrays.asList(result));
 
 		gameController.movesForAI(result[1]);
-//		debugPrintSimpleGame(result[1]);
+		debugPrintSimpleGame(result[1], gameController);
 		System.out.println("Player 1 = " +game.getPunctuation(1)+ ".");
 		System.out.println("Player 2 = " +game.getPunctuation(2)+ ".");
 
@@ -224,14 +249,16 @@ public class Main{
 //	}
 //	
 	static int boardN = 1;
-	public static void debugPrintSimpleGame(String moves) {
+
+
+	public static void debugPrintSimpleGame(String moves, GameController gameController) {
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-//		System.out.println("Parse game with moves: " +moves);
+		System.out.println("Parse game with moves: " +moves);
 		Game debugGame = Parsers.parseGameFromSimpleGameMoves(moves, numberOfHexagonsCenterRow, gameController.getPlayerToPlay());
 //		System.out.println("Parse game with moves: " +debugGame.getPlayHistory());
 		long p1 = debugGame.getPunctuation(1);

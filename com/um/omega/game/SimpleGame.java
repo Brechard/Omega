@@ -91,8 +91,8 @@ public class SimpleGame {
 	}
 	
 	public long getRate() {
-		return playerToPlay == 1 ? union1.getCount() : union2.getCount();
-//		return playerToPlay == 1 ? union1.getCount() - union2.getCount(): union2.getCount() - union1.getCount();
+//		return playerToPlay == 1 ? union1.getCount() : union2.getCount();
+		return playerToPlay == 1 ? union1.getCount() - union2.getRealCount(): union2.getCount() - union1.getRealCount();
 	}
 	
 	public ArrayList<SimpleGame> possibleGames(int[][] moves) {
