@@ -15,6 +15,7 @@ public class SimpleGame {
 	public UnionFind union1;
 	public UnionFind union2;
 	private String playHistory = "";
+	public int[][] lastMoves;
 
 	public SimpleGame(int numberOfHexagonsSide, int playerToPlay, int[] game, int[][] moves, UnionFind[] unionFinds, String playHistory) {
 		this.numberOfHexagonsSide = numberOfHexagonsSide;
@@ -23,9 +24,10 @@ public class SimpleGame {
 		this.union1 = new UnionFind(unionFinds[0]);
 		this.union2 = new UnionFind(unionFinds[1]);
 		this.playHistory =  playHistory;
+		this.lastMoves = moves;
 		for(int[] move: moves) {
+//			System.out.println("Make move " +move[1]+ ", player" +move[0]);
 			makeMove(move[0], move[1]);
-			moveConfirmed(move[0], move[1]);
 		}
 	}
 
@@ -60,6 +62,8 @@ public class SimpleGame {
 	}
 	
 	public void makeMove(int player, int cellId){
+//		if(game[cellId] != 0)
+//			throw new Error("The cellId " +cellId+ " is already occupied " +Arrays.toString(game));
 		game[cellId] = player;
 		moveConfirmed(player, cellId);
 	}
@@ -87,43 +91,76 @@ public class SimpleGame {
 	}
 	
 	public long getRate() {
-		return playerToPlay == 1 ? union1.getCount(): union2.getCount();
-//		return union1.getCount() - union2.getCount();
+		return playerToPlay == 1 ? union1.getCount() : union2.getCount();
+//		return playerToPlay == 1 ? union1.getCount() - union2.getCount(): union2.getCount() - union1.getCount();
+	}
+	
+	public ArrayList<SimpleGame> possibleGames(int[][] moves) {
+		ArrayList<SimpleGame> possibleGames = new ArrayList<>();
+//		int[][] moves = SearchAlgorithms.getOrderedMovesMade();
+		for(int i = 0; i < moves.length; i++) {
+//			System.out.print("Move 1 to do now "+moves[i][0]);
+//			System.out.println(", " +game[moves[i][0]]);
+			if(game[moves[i][0]] == 0) { // The Cell is empty
+
+//				possibleGames.add(new SimpleGame(numberOfHexagonsSide, 
+//						playerToMove == 2 ? (playerToPlay == 2 ? 1 : 2) : playerToPlay,
+//								game, 
+//								new int[] {playerToMove, i},
+//								new UnionFind[] {union1, union2},
+//								playHistory, 
+//								playerToMove == 1 ? 2 : 1));
+				
+				for(int j = i + 1; j < moves.length; j++) {
+//					System.out.print("Move 2 to do now "+moves[j][0]);
+//					System.out.println(", " +game[moves[j][0]]);
+					if(game[moves[j][0]] == 0) {
+						possibleGames.add(new SimpleGame(numberOfHexagonsSide, 
+								playerToPlay == 1 ? 2 : 1,
+								game,
+								new int[][] {new int[] {1, moves[i][0]}, new int[] {2, moves[j][0]}},
+								new UnionFind[] {union1, union2},
+								playHistory));
+						possibleGames.add(new SimpleGame(numberOfHexagonsSide, 
+								playerToPlay == 1 ? 2 : 1,
+								game,
+								new int[][] {new int[] {2, moves[i][0]}, new int[] {1, moves[j][0]}},
+								new UnionFind[] {union1, union2},
+								playHistory));
+					}
+				}
+			}
+		}
+		return possibleGames;
 	}
 	
 	public ArrayList<SimpleGame> possibleGames() {
 		ArrayList<SimpleGame> possibleGames = new ArrayList<>();
 		for(int i = 0; i < game.length; i++) {
 			if(game[i] == 0) { // The Cell is empty
-
-				possibleGames.add(new SimpleGame(numberOfHexagonsSide, 
-						playerToMove == 2 ? (playerToPlay == 2 ? 1 : 2) : playerToPlay,
-								game, 
-								new int[] {playerToMove, i},
+				for(int j = i + 1; j < game.length; j++) {
+//					System.out.print("Move 2 to do now "+moves[j][0]);
+//					System.out.println(", " +game[moves[j][0]]);
+					if(game[j] == 0) {
+						possibleGames.add(new SimpleGame(numberOfHexagonsSide, 
+								playerToPlay == 1 ? 2 : 1,
+								game,
+								new int[][] {new int[] {1, i}, new int[] {2, j}},
 								new UnionFind[] {union1, union2},
-								playHistory, 
-								playerToMove == 1 ? 2 : 1));
-				
-//				for(int j = i + 1; j < game.length; j++) {
-//					if(game[j] == 0) {
-//						possibleGames.add(new SimpleGame(numberOfHexagonsSide, 
-//								playerToPlay == 1 ? 2 : 1,
-//								game, 
-//								new int[][] {new int[] {1, i}, new int[] {2, j}},
-//								new UnionFind[] {union1, union2},
-//								playHistory));
-//						possibleGames.add(new SimpleGame(numberOfHexagonsSide, 
-//								playerToPlay == 1 ? 2 : 1,
-//								game, 
-//								new int[][] {new int[] {2, i}, new int[] {1, j}},
-//								new UnionFind[] {union1, union2},
-//								playHistory));
-//					}
-//				}
+								playHistory));
+						possibleGames.add(new SimpleGame(numberOfHexagonsSide, 
+								playerToPlay == 1 ? 2 : 1,
+								game,
+								new int[][] {new int[] {2, i}, new int[] {1, j}},
+								new UnionFind[] {union1, union2},
+								playHistory));
+					}
+				}
 			}
 		}
 		return possibleGames;
 	}
+
 		
 	public int[] getGame() {
 		return game;

@@ -29,6 +29,7 @@ public class Parsers {
 		System.out.println("The moves received are " +s);
 		System.out.println("The moves already done are " +gameController.getGameHistory());
 		ArrayList<String> newMoves = Moves.getMoveToDo(movesReceived, gameController.getGameHistory());
+		System.out.println("The moves to do are: " +newMoves.toString());
 		if(newMoves.size() >= 2) {
 			for(int i = 0; i < 2; i++) {
 				String cell = newMoves.get(i);
@@ -39,7 +40,6 @@ public class Parsers {
 						Integer.valueOf(cellData[3]));				// cellId
 				System.out.println("The next move for player " +cellData[0]+ ", is: (" +cellData[1]+ ", " +cellData[2]+ ")");
 			}
-			
 		} else {
 			System.out.println();
 			System.out.println("-------------");

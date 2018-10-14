@@ -95,7 +95,7 @@ public class UserInterface extends JPanel implements MouseListener{
 				if(h.contains(e.getX(), e.getY())) {
 					String move = "(" +h.getxCubePosition()+ "," + h.getyCubePosition() +")";
 					System.out.println("The cell clicked is: " +move);
-					gameController.moveMade(h.getxCubePosition(), h.getyCubePosition(), h.getId());
+					gameController.moveMade(h.getxCubePosition(), h.getyCubePosition());
 					return;
 				}
 			}

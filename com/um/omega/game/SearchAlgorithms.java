@@ -2,6 +2,7 @@ package com.um.omega.game;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 
 import Helpers.Flag;
@@ -13,53 +14,69 @@ public class SearchAlgorithms {
 	
 	public static long numberOfSearches = 0;
 	public static long prunings = 0;
-	
-	public static void cleanHashMap() {
-		hashMap = new HashMap<Long, TTInfo>();
-	}
-	public static String[] aspirationSearch(SimpleGame game, int delta, int maxDepth, GameController gameController) {
+	public static int[][] movesMade;
+	private static boolean calculate = true;
+		
+	public static String[] aspirationSearch(SimpleGame game, int delta, int maxDepth, GameController gameController, final int counter) {
 //		System.out.println("Start the search, the playerToPlay is: " +game.playerToPlay+ " the startPlayer is: " +Main.gameController.getFirstPlayer());
 //		System.out.println("Is it possible to keep playing?" +(game.emptyCells.size() < 4)+ " and " +(game.playerToPlay == Main.gameController.getFirstPlayer()));
 		String[] result = null;
+		String[] newResult = null;
+		
+		startCalculating();
+		
+		Thread counterThread = new Thread() {
+			public void run() {
+				try {
+					Thread.sleep(counter * 1000);
+					finishCalculating();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}						
+			}
+		};
+		counterThread.start();
 		for(int depth = 1; depth <= maxDepth; depth++ ) {
 			long alpha = - delta; 
 			long beta = + delta;
 			numberOfSearches = 0;
-			result = alphaBetaWithTT(game, depth, alpha, beta, gameController, -1);
-			long score = Long.valueOf(result[0]);
-			System.out.println("For depth " +depth+ " the result is: " +Arrays.toString(result));
+//			initiateMovesMade(movesMade.length);
+			newResult = alphaBetaWithTT(game, depth, alpha, beta, gameController, getOrderedMovesMade());
+			long score = Long.valueOf(newResult[0]);
+			System.out.println("For depth " +depth+ " the result is: " +Arrays.toString(newResult));
+			if(newResult[1] == null || newResult[1] == "" || (result != null && newResult[1].length() <= result[1].length())) {
+				System.out.println("For depth " +depth+ " the result is an error");
+				break;
+			}
+			result = newResult;
 			if( score >= beta ) {
 				alpha = score; 
 				beta = (long) Long.MAX_VALUE;
 				System.out.println("Failed high " +depth+ " alpha: " +alpha+ " beta: " +beta);
-				result = alphaBetaWithTT(game, depth, alpha, beta, gameController, -1);
+				result = alphaBetaWithTT(game, depth, alpha, beta, gameController, getOrderedMovesMade());
 				score = Long.valueOf(result[0]);
 			} else if( score <= alpha ) {
 				alpha  = (long) Long.MIN_VALUE;
 				beta = score;
 				System.out.println("Failed low " +depth+ " alpha: " +alpha+ " beta: " +beta);
-				result = alphaBetaWithTT(game, depth, alpha, beta, gameController, -1);
+				result = alphaBetaWithTT(game, depth, alpha, beta, gameController, getOrderedMovesMade());
 				score = Long.valueOf(result[0]);
 			}
 			System.out.println("Search in depth " +depth+ " alpha: " +alpha+ " beta: " +beta);
+			System.out.println("-------");
+			for(int[] i: SearchAlgorithms.getOrderedMovesMade())
+				System.out.println(Arrays.toString(i));
+			System.out.println("-------");
 		}
+		counterThread.stop();
 		return result;
 	}
 
-	public static String[] alphaBetaWithTT(SimpleGame game, int depth, long alpha, long beta, GameController gameController, int previousMinMax) {
+	public static String[] alphaBetaWithTT(SimpleGame game, int depth, long alpha, long beta, GameController gameController, int[][] moves) {
 		numberOfSearches++;
-		if(numberOfSearches > 10)
-			return new String[] {String.valueOf(1), ""};
 		long originalAlpha = alpha;
 		long hash = gameController.getHash(game.getGame());
-		int minMax = -previousMinMax;
-
-		System.out.println("Depth " +depth+ " playerToPlay " +game.getPlayerToPlay()+ " playerToMove " +game.getPlayerToMove()+ " previousMinMax: " +previousMinMax);
-		System.out.println("Depth " +depth+ " game: " +Arrays.toString(game.getGame()));
-		System.out.println("MinMax: " +(minMax == 1 ? "Min" : "Max"));
-
-		//		System.out.println("I HAVE BEEN CALLED BY: " +Arrays.toString(game.getGame()));
-//		System.out.println("hashMapContains " +hashMap.containsKey(hash)+ " the hash " +hash);
 
 		if(hashMap.containsKey(hash) && hashMap.get(hash).depth >= depth) {
 			TTInfo gameInfo = hashMap.get(hash);
@@ -73,56 +90,39 @@ public class SearchAlgorithms {
 			if (alpha >= beta)
 				return gameInfo.getInfo();
 		}
-//		System.out.println("Hash not found: " +game.getHash());
 		
-//		System.out.println();
-//		System.out.println("In depth " +depth+ " is it possible to keep playing?" +(game.emptyCells.size() < 4)+ " and " 
-//				+(game.playerToPlay == Main.gameController.getFirstPlayer()));
-//		System.out.println("The playerToPlay is: " +game.playerToPlay+ " the startPlayer is: " +Main.gameController.getFirstPlayer());
-
-//		numberOfSearches++;
-//		System.out.println("The game observed now is: " +game.playHistory);
-//		if(Main.a == 2) {
-//		}
-		if(!game.isPossibleMoreMoves() || depth == 0) {
-//			System.out.println("The rate is: " +game.getRate());
-//			System.out.println();
-//			long h = game.getHash();
-//			if(hashes.contains(h))
-//				hashCount++;
-//			else hashes.add(h);
+		if(!game.isPossibleMoreMoves() || depth == 0 || !calculate) {
 			return new String[] {String.valueOf(game.getRate()), game.getPlayHistory()};
 		}
-//		System.out.println();
 		
 		long score = Long.MIN_VALUE;
 
 		String[] valueToReturn = new String[] {String.valueOf(score), ""};
 		String[] valueHelper = new String[] {String.valueOf(score), ""};
-		ArrayList<SimpleGame> childGames = game.possibleGames();
+		ArrayList<SimpleGame> childGames = game.possibleGames(moves);
 		long value;
-		if(childGames.size() == 0)
-			System.out.println("------------------------------------- " +game.getPlayHistory());
-		
-//		System.out.println("Depth " +depth+ " number of childGames: " +childGames.size()+ " alpha: " +alpha+ " beta: " +beta);
-//		
-//		System.out.println("Depth " +depth+ " game: " +Arrays.toString(game.getGame()));
+
 		for(int child = 0; child < childGames.size(); child++) {
-//			System.out.println("Depth " +depth+ " child: " +child+ " childGame: " +Arrays.toString(childGames.get(child).getGame()));
-			if(minMax == 1)
-				valueHelper = alphaBetaWithTT(childGames.get(child), depth -1,(long) -beta,(long) -alpha, gameController, minMax);
-			else
-				valueHelper = alphaBetaWithTT(childGames.get(child), depth -1,(long) alpha,(long) beta, gameController, minMax);
-			value = -minMax * Long.valueOf(valueHelper[0]);
-//			System.out.println("Depth " +depth+ " child: " +child+ " score: "+score+ " beta: " +beta+" value calculated: " +valueHelper[0]);
-//			System.out.println(valueHelper[1]);
+			valueHelper = alphaBetaWithTT(childGames.get(child), depth -1,(long) -beta,(long) -alpha, gameController, moves);
+//			final int child2 = child; 
+			value = -Long.valueOf(valueHelper[0]);
 			if(value > score) {
+//				final int child2 = child;
+//				new Thread() {
+//					public void run() {
+//					System.out.println("Depth: " +depth+ " move: " +i[1]);
+//				}
+//				moves = getOrderedMovesMade();
+//					}
+//				}.start();
 				score = value;
 				valueToReturn = new String[]{String.valueOf(value), valueHelper[1]};
 			}
 			if(score > alpha) alpha = score;
 			if(score >= beta) {
-//				System.out.println("Depth " +depth+ " child: " +child+ " BREAK --------------");
+				for(int[] i: childGames.get(child).lastMoves)
+					moveMade(i[1]);
+//				moves = getOrderedMovesMade();
 				prunings++;
 				break;
 			}
@@ -140,4 +140,36 @@ public class SearchAlgorithms {
 		hashMap.put(hash, new TTInfo(flag, valueHelper, depth));
 		return valueToReturn;
 	}
+	
+	public static void initiateMovesMade(int size) {
+		movesMade = new int[size][2];
+		for(int i = 0; i < size; i++)
+			movesMade[i] = new int[] {i, 0};
+	}
+	
+	public static void moveMade(int id) {
+		movesMade[id][1]++;
+	}
+	
+	public static int[][] getOrderedMovesMade(){
+		int[][] ordered = movesMade.clone();
+
+		Arrays.sort(ordered, Comparator.comparing((int[] arr) -> arr[1])
+                .reversed());
+		return ordered;
+	}
+	
+	public static void cleanHashMap() {
+		hashMap = new HashMap<Long, TTInfo>();
+	}
+	
+	public static void finishCalculating() {
+		System.out.println("TAKING TOO LONG, STOP");
+		calculate = false;
+	}
+
+	public static void startCalculating() {
+		calculate = true;
+	}
+
 }

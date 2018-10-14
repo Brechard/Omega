@@ -80,9 +80,10 @@ public class GameController {
 			playerFinish();
 	}
 	
-	public void moveMade(int x, int y, int id) {
+	public void moveMade(int x, int y) {
+		int id;
 		try{
-			game.setCellToPlayer(playerToMove, x, y);
+			id = game.setCellToPlayer(playerToMove, x, y);
 		} catch (Error e) {
 			System.err.println(e+ ", cell already in use");
 			return;
@@ -159,6 +160,10 @@ public class GameController {
 	 */
 	public String getXYFromId(int id) {
 		return cellsIdToXY[id];
+	}
+	
+	public int getIdFromXY(int x, int y) {
+		return xyToIdMap.get(x+ ", " +y);
 	}
 	
 	public void startDictionariesGameSimpleGame(ArrayList<Cell> listCells) {

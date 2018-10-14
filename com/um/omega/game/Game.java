@@ -245,7 +245,7 @@ public class Game {
 	 * @param y
 	 * @throws Error
 	 */
-	public void setCellToPlayer(int player, int x, int y) throws Error{
+	public int setCellToPlayer(int player, int x, int y) throws Error{
 		for(Cell cell: emptyCells) {
 			if(cell.equals(x, y)) {
 				emptyCells.remove(cell);
@@ -254,7 +254,7 @@ public class Game {
 //				uniteMoveConfirmed(player, cell);
 
 //				playHistory += "(" +player+ ", " +cell.x+ ", " +cell.y+ ").";
-				return;
+				return cell.id;
 			}
 		}
 		throw new Error("The cell (" +x+", " +y+ ") is not empty");
