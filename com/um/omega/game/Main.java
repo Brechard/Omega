@@ -5,8 +5,12 @@ import java.util.Scanner;
 
 import javax.swing.JFrame;
 
+import Debug.GameController2;
+import Debug.SearchAlgorithms2;
 import Helpers.GameController;
 import Helpers.Parsers;
+import Helpers.TextFileManager;
+import ObjectsToHelp.Games;
 
 public class Main{
 	
@@ -16,7 +20,7 @@ public class Main{
 	public static final int numberOfPlayers = 2;
 	public final static int sizeSideHexagon = 4;
 	
-	private static int depthToSearch = 3;
+	private static int depthToSearch = 1;
 	public static int numberOfHexagonsCenterRow;
 	private static JFrame frame = new JFrame("Board");
 	public static GameController gameController;
@@ -27,100 +31,49 @@ public class Main{
 
 		numberOfHexagonsCenterRow = sizeSideHexagon * 2 - 1;
 
-//		play();
+		play(recoverLastGame(true));
 		
 //		playAIvsAI();
 
-		debug();
-//		simpleGame = new SimpleGame(sizeSideHexagon, 1);
-//		int[][] bestPlays = new int[simpleGame.getGame().length][2];
-//		for(int i = 0; i < simpleGame.getGame().length; i++) {
-//			bestPlays[i] = new int[]{i, 1 + new Random().nextInt(20)};
-//		}
-//		
-//		int[][] ordered = bestPlays.clone();
-//
-//		Arrays.sort(ordered, Comparator.comparing((int[] arr) -> arr[1])
-//                .reversed());
-//		for(int[] i : ordered)
-//			System.out.println(Arrays.toString(i));
-//		System.out.println("--------------");
-//		for(int[] i : bestPlays)
-//			System.out.println(Arrays.toString(i));
-			
-
-
-	}
-	
-	
-	public static void debug() {
-		SimpleGame simpleGameAIis2 = new SimpleGame(sizeSideHexagon, 2);
-		game = new Game(numberOfHexagonsCenterRow, 1);
-		GameController gameControllerAIis2 = new GameController(game, simpleGameAIis2, numberOfPlayers, 1);
-		oneSearch(gameControllerAIis2, simpleGameAIis2);
+//		debug(depthToSearch);
 		
-		restart(simpleGameAIis2);
-		
-		game = new Game(numberOfHexagonsCenterRow, 1);
-		SimpleGame simpleGameAIis1 = new SimpleGame(sizeSideHexagon, 1);		
-		GameController gameControllerAIis1 = new GameController(game, simpleGameAIis1, numberOfPlayers, 1);
-		oneSearch(gameControllerAIis1, simpleGameAIis1);
-
-//		debugPrintSimpleGame(simpleGameAIis1.getPlayHistory(), gameControllerAIis1);		
-		
-//		for(SimpleGame g: simpleGame.possibleGames()) {
-//			System.out.println(g.getPlayHistory());
-//			for(SimpleGame g1: g.possibleGames())
-//				System.out.println(g1.getPlayHistory());
-//			
-//		}
 	}
 	
-	public static void restart(SimpleGame simpleGame) {
-		depthToSearch = 3;
-		SearchAlgorithms.initiateMovesMade(simpleGame.getGame().length);		
+	public static Games recoverLastGame(boolean recover) {
+		if(!recover)
+			return null;
+		return TextFileManager.recoverLastGame();
 	}
 	
-	public static void playAIvsAI() {
-		simpleGame = new SimpleGame(sizeSideHexagon, 1);
-		game = new Game(numberOfHexagonsCenterRow, 1);
-		gameController = new GameController(game, simpleGame, numberOfPlayers, 1);
-				
-		while(simpleGame.isPossibleMoreRounds()) {
-
-			oneSearch(gameController);
-			System.out.println("1 done");
-			System.out.println("----");
-			printGame();			
-			oneSearch(gameController);
-			System.out.println("2 done");
-			System.out.println("----");
-			printGame();
-		}
-	}
-
-	
-	public static void play() {
-		numberOfHexagonsCenterRow = sizeSideHexagon * 2 - 1;
+	public static void play(Games gamesRecovered) {
 		Scanner sc = new Scanner(System.in);
 //		System.out.println("What player plays first? 1 or 2?");
-		
-		System.out.println("What player plays first? The opponent (2) or me (1)?");
-		int whoPlaysFirst;
-		while(true) {
-			try {
-				whoPlaysFirst = Integer.valueOf(sc.nextLine());							
-				break;
-			} catch (NumberFormatException e) {
-				System.err.println("Error in the input");
+		int playerAI;
+		if(gamesRecovered != null) {
+			simpleGame = gamesRecovered.simpleGame;
+			game = gamesRecovered.game;
+			playerAI = simpleGame.getPlayerAI();
+		} else {
+			System.out.println("What player is the AI?");
+			while(true) {
+				try {
+					playerAI = Integer.valueOf(sc.nextLine());							
+					if(playerAI != 1 && playerAI != 2)
+						throw new NumberFormatException("It is only possible to select between player 1 or 2");
+					break;
+				} catch (NumberFormatException e) {
+					System.err.println("Error in the input " +e);
+				}
 			}
+			simpleGame = new SimpleGame(sizeSideHexagon, playerAI);
+			game = new Game(numberOfHexagonsCenterRow, playerAI);
 		}
-		simpleGame = new SimpleGame(sizeSideHexagon, whoPlaysFirst);
-		game = new Game(numberOfHexagonsCenterRow, whoPlaysFirst);
-		gameController = new GameController(game, simpleGame, numberOfPlayers, whoPlaysFirst);
-		
+		if(gamesRecovered != null)
+			gameController = new GameController(game, simpleGame, numberOfPlayers, playerAI, gamesRecovered.playerTurn, gamesRecovered.fileNumber);
+		else gameController = new GameController(game, simpleGame, numberOfPlayers, playerAI);
+
 		if(gameController.isAIturn())
-			oneSearch(gameController);
+			oneSearch(gameController, simpleGame);
 //		else
 		printGame();
 		System.out.println(Arrays.toString(simpleGame.getGame()));
@@ -130,74 +83,60 @@ public class Main{
 		while(!lastRound) {
 
 			System.out.println();
-			System.out.println("PlayerToPlay (gameController):  " +gameController.getPlayerToPlay()+ " simpleGame: " +simpleGame.getPlayerToPlay());
+			System.out.println("PlayerToPlay (gameController):  " +gameController.getPlayerToPlay()+ " simpleGame AIPlayer: " +simpleGame.getPlayerAI());
 			System.out.println("PlayerToMove: " +gameController.getPlayerToMove()+ " it's AI turn? " +gameController.isAIturn());
 			System.out.println("The movements of the other player are: ");
-			System.out.println("Player 1 (White, US): ");
+			System.out.println("Player 1 (White, " +(playerAI == 1 ? " AI" : " OPPONENT")+"): ");
 
 			while(!gameController.isAIturn() && gameController.getPlayerToMove() == 1)
 				try { Thread.sleep(100); } catch (InterruptedException e) { e.printStackTrace();}
 			printGame();
-
-			System.out.println("Player 2 (Black, OPPONENT): ");
+			
+			System.out.println("Player 2 (Black, " +(playerAI == 2 ? " AI" : " OPPONENT")+"): ");
 
 			while(!gameController.isAIturn() && gameController.getPlayerToMove() == 2)
 				try { Thread.sleep(100); } catch (InterruptedException e) { e.printStackTrace();}
 			printGame();
-			
 			System.out.println("Is this correct? Yes, No?");
 			String s = sc.nextLine().toUpperCase();
 			if(s.equals("N") || s.equals("No")) {
 				gameController.undoMoves();
 			} else {
 				lastRound |= gameController.confirmMoves();
-				if(gameController.getFirstPlayer() == 1 && lastRound)
+				if(gameController.getAIPlayer() == 1 && lastRound)
 					break;
 				System.out.println(Arrays.toString(simpleGame.getGame()));
-				System.out.println("---- PlayerToPlay (gameController):  " +gameController.getPlayerToPlay()+ " simpleGame: " +simpleGame.getPlayerToPlay());
-				oneSearch(gameController);
+				System.out.println("---- PlayerToPlay (gameController):  " +gameController.getPlayerToPlay()+ " simpleGame AIPlayer: " +simpleGame.getPlayerAI());
+				oneSearch(gameController, simpleGame);
 				SearchAlgorithms.numberOfSearches = 0;
-				System.out.println("--------- PlayerToPlay (gameController):  " +gameController.getPlayerToPlay()+ " simpleGame: " +simpleGame.getPlayerToPlay());
+				System.out.println("--------- PlayerToPlay (gameController):  " +gameController.getPlayerToPlay()+ " simpleGame AIPlayer: " +simpleGame.getPlayerAI());
 				lastRound |= !game.isPossibleMoreRounds();
-				if(gameController.getFirstPlayer() == 1 && lastRound)
+				if(gameController.getAIPlayer() == 1 && lastRound)
 					lastRound = false;
 			}
 			printGame();			
 		}
-		System.out.println();
-		System.out.println();
-		System.out.println("-------------------------------");
-		System.out.println("GAME FINISHED");
-		long p1 = game.getPunctuation(1);
-		long p2 = game.getPunctuation(2);
-		System.out.println("Player 1 = " +p1+ ".");
-		System.out.println("Player 2 = " +p2+ ".");
-		System.out.println("-------------------------------");
-		System.out.println();
-		System.out.println("THE WINNER IS PLAYER = " +(p1 > p2 ? 1 : 2)+ ".");
-		System.out.println();
-		System.out.println("-------------------------------");
-		System.out.println();
-		System.out.println();
+		gameController.finishGame();
 		sc.close();
 	}
+	
 	public static int i = 0;
-	public static void oneSearch(GameController gameController) {}
 
-	public static void oneSearch(GameController gameController, SimpleGame simpleGame) {
+	public static String[] oneSearch(GameController gameController, SimpleGame simpleGame) {
 		System.out.println();
 		System.out.println("Calculating ...");
 		long startTime = System.currentTimeMillis();
 
-//		i++;
 //		System.out.println("Is "+i+" even? " +((i & 1) == 0)+ " depth: " +depthToSearch);
-//		if((i & 1) == 0) {
-//			depthToSearch++;
-//			System.out.println("DEPTH AUGMENTED TO "+depthToSearch);
-//		}
+		if((i & 1) == 0 && i != 0) {
+			depthToSearch++;
+			System.out.println("DEPTH AUGMENTED TO "+depthToSearch);
+		}
+		i++;
 		
 		SearchAlgorithms.initiateMovesMade(simpleGame.getGame().length);
 		String[] result = SearchAlgorithms.aspirationSearch(simpleGame, 10, depthToSearch, gameController, 12000);
+//		String[] result = SearchAlgorithms.alphaBetaWithTT(simpleGame, 2, -999999, 999999, gameController, SearchAlgorithms.getOrderedMovesMade());
 
 //		for(int[] i: SearchAlgorithms.movesMade) {
 //			System.out.println(Arrays.toString(i));
@@ -215,13 +154,13 @@ public class Main{
 		int minutes = (int) duration/60;
 		System.out.println("It took " +minutes+ " minutes " +(duration - minutes * 60) +" s to calculate it.");
 		System.out.println("Number of searches: " +SearchAlgorithms.numberOfSearches+ " and prunes: " +SearchAlgorithms.prunings);
-
 		System.out.println("Response: " +Arrays.asList(result));
 
 		gameController.movesForAI(result[1]);
 		debugPrintSimpleGame(result[1], gameController);
 		System.out.println("Player 1 = " +game.getPunctuation(1)+ ".");
 		System.out.println("Player 2 = " +game.getPunctuation(2)+ ".");
+		return result;
 
 	}
 	
@@ -250,7 +189,44 @@ public class Main{
 //	
 	static int boardN = 1;
 
+	public static void debugPrintSimpleGame(String moves, GameController2 gameController) {
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println("Parse game with moves: " +moves);
+		Game debugGame = Parsers.parseGameFromSimpleGameMoves(moves, numberOfHexagonsCenterRow);
+//		System.out.println("Parse game with moves: " +debugGame.getPlayHistory());
+		long p1 = debugGame.getPunctuation(1);
+		long p2 = debugGame.getPunctuation(2);
+		System.out.println();
+		System.out.println("-------------------------------");
+		System.out.println("DEBUG Player 1 = " +p1+ ".");
+		System.out.println("DEBUG Player 2 = " +p2+ ".");
+		if(p1 == p2)
+			System.out.println("BOTH PLAYER HAVE THE SAME RESULT");
+		else 
+			System.out.println("THE WINNER IS PLAYER = " +(p1 > p2 ? 1 : 2)+ ".");
+		System.out.println("-------------------------------");
+		System.out.println();
+		JFrame frame = new JFrame("Debug board " +boardN++);
+		Debug.UserInterface ui = new Debug.UserInterface(boardSize, numberOfHexagonsCenterRow, debugGame, gameController);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.add(ui);
+		frame.setSize(boardSize, boardSize);
+		frame.setVisible(true);
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
 
+	
 	public static void debugPrintSimpleGame(String moves, GameController gameController) {
 		try {
 			Thread.sleep(1000);
@@ -259,7 +235,7 @@ public class Main{
 			e.printStackTrace();
 		}
 		System.out.println("Parse game with moves: " +moves);
-		Game debugGame = Parsers.parseGameFromSimpleGameMoves(moves, numberOfHexagonsCenterRow, gameController.getPlayerToPlay());
+		Game debugGame = Parsers.parseGameFromSimpleGameMoves(moves, numberOfHexagonsCenterRow);
 //		System.out.println("Parse game with moves: " +debugGame.getPlayHistory());
 		long p1 = debugGame.getPunctuation(1);
 		long p2 = debugGame.getPunctuation(2);
@@ -267,7 +243,10 @@ public class Main{
 		System.out.println("-------------------------------");
 		System.out.println("DEBUG Player 1 = " +p1+ ".");
 		System.out.println("DEBUG Player 2 = " +p2+ ".");
-		System.out.println("THE WINNER IS PLAYER = " +(p1 > p2 ? 1 : 2)+ ".");
+		if(p1 == p2)
+			System.out.println("BOTH PLAYER HAVE THE SAME RESULT");
+		else 
+			System.out.println("THE WINNER IS PLAYER = " +(p1 > p2 ? 1 : 2)+ ".");
 		System.out.println("-------------------------------");
 		System.out.println();
 		JFrame frame = new JFrame("Debug board " +boardN++);
@@ -285,8 +264,11 @@ public class Main{
 		
 	}
 
-	
 	public static void printGame() {
+		printGame(game);
+	}
+	
+	public static void printGame(Game game) {
 		UserInterface ui = new UserInterface(boardSize, numberOfHexagonsCenterRow, game, gameController);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.add(ui);

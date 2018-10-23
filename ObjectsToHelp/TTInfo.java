@@ -1,6 +1,4 @@
-package com.um.omega.game;
-
-import Helpers.Flag;
+package ObjectsToHelp;
 
 public class TTInfo {
 	

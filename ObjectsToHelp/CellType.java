@@ -1,4 +1,4 @@
-package Helpers;
+package ObjectsToHelp;
 
 public enum CellType {
 	TOP_LEFT_CORNER, TOP_SIDE, TOP_RIGHT_CORNER, 

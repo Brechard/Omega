@@ -2,6 +2,8 @@ package Helpers;
 
 import com.um.omega.game.UnionFind;
 
+import ObjectsToHelp.CellType;
+
 public class SimpleGameHelpers {
 	public static UnionFind searchNeighbourForUnionFind(int cellId, UnionFind unionFind, int[] game, int numberOfHexagonsSide) {
 		int player = game[cellId];

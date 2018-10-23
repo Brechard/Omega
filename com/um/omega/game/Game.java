@@ -131,29 +131,6 @@ public class Game {
 		rate = (player == 1) ? union1.getCount() : union2.getCount();
 		return rate;
 	}
-		
-//		alreadyCounted = new ArrayList<>();
-//		group = 0;
-//		rate = 1;
-//		ArrayList<Cell> playerCells = (player == 1) ? player1 : player2;
-//
-//		playerCells.stream().filter(cell -> !alreadyCounted.contains(cell)).forEach(
-//				cell -> {
-//					group = 1;
-//					alreadyCounted.add(cell);
-//					searchNeighbor(cell, playerCells);
-//					rate = rate * group;
-
-//					if(group > 3)
-//						rate -= (group - 3) * 3;
-//
-//					System.out.print("Player: " +player+ ", finish with the point: " +cell.getPointString()+ " RN the group count is: " +group);
-//					System.out.println(", and the rate count is: " +rate);
-//				}
-//			);
-//
-//		return rate;
-//	}
 	
 	/**
 	 * Calculates the punctuation of a player
@@ -202,24 +179,18 @@ public class Game {
 				emptyCells.size() > 2;
 	}
 
-	public ArrayList<HashSet<Integer>> createNeighbours() {
+	public void createNeighbours() {
 		ArrayList<Cell> cellsToSearch = new ArrayList<>(emptyCells);
-		ArrayList<HashSet<Integer>> neighbours = new ArrayList<>();
-		for(int i = 0; i < emptyCells.size(); i++) {
-			neighbours.add(i, new HashSet<Integer>());			
-		}
+
 		for(Cell c: emptyCells) {
 			cellsToSearch.remove(c);
 			for(Cell c1: cellsToSearch) {
 				if(c.isNeighbour(c1)) {
-					neighbours.get(c.id).add(c1.id);						
-					neighbours.get(c1.id).add(c.id);
 					c.addNeighbour(c1);
 					c1.addNeighbour(c);
 				}
 			}
 		}
-		return neighbours;
 	}
 	
 	/**
@@ -251,9 +222,6 @@ public class Game {
 				emptyCells.remove(cell);
 				if(player == 1) player1.add(cell);
 				else player2.add(cell);
-//				uniteMoveConfirmed(player, cell);
-
-//				playHistory += "(" +player+ ", " +cell.x+ ", " +cell.y+ ").";
 				return cell.id;
 			}
 		}

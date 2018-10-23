@@ -1,16 +1,18 @@
-package com.um.omega.game;
+package Debug;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 
+import com.um.omega.game.SimpleGame;
+
 import Helpers.GameController;
 import Helpers.Parsers;
 import ObjectsToHelp.Flag;
 import ObjectsToHelp.TTInfo;
 
-public class SearchAlgorithms {
+public class SearchAlgorithms2 {
 
 	private static HashMap<Long, TTInfo> hashMap = new HashMap<Long, TTInfo>();
 	
@@ -19,8 +21,9 @@ public class SearchAlgorithms {
 	public static int[][] movesMade;
 	private static boolean calculate = true;
 		
-	public static String[] aspirationSearch(SimpleGame game, int delta, int maxDepth, GameController gameController, final int counter) {
-		System.out.println("Start the search, depth: " +maxDepth+ ", the playerToPlay in game is: " +gameController.getPlayerToPlay()+ " AI player: " +game.getPlayerAI());
+	public static String[] aspirationSearch(SimpleGame game, int delta, int maxDepth, GameController2 gameController, final int counter) {
+		System.out.println("Start the search, depth: " +maxDepth+ 
+				" AI player: " +game.getPlayerAI());
 //		System.out.println("Is it possible to keep playing?" +(game.emptyCells.size() < 4)+ " and " +(game.playerToPlay == Main.gameController.getFirstPlayer()));
 		String[] result = null;
 		String[] newResult = null;
@@ -78,7 +81,7 @@ public class SearchAlgorithms {
 		return result;
 	}
 
-	public static String[] alphaBetaWithTT(SimpleGame game, int depth, long alpha, long beta, GameController gameController, int[][] moves) {
+	public static String[] alphaBetaWithTT(SimpleGame game, int depth, long alpha, long beta, GameController2 gameController, int[][] moves) {
 		numberOfSearches++;
 		long originalAlpha = alpha;
 		long hash = gameController.getHash(game.getGame());
