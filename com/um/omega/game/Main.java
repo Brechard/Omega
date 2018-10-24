@@ -18,12 +18,14 @@ public class Main{
 	public static Game game;
 	public static SimpleGame simpleGame;
 	public static final int numberOfPlayers = 2;
-	public final static int sizeSideHexagon = 4;
+	public final static int sizeSideHexagon = 5;
 	
-	private static int depthToSearch = 5;
+	private static int depthToSearch = 3;
 	public static int numberOfHexagonsCenterRow;
 	private static JFrame frame = new JFrame("Board");
 	public static GameController gameController;
+	private static int numberRoundsAInotPlay = 3;
+
 	// private static int numberOfSearches = 0;
 	// Check Bitboard
 	
@@ -70,10 +72,10 @@ public class Main{
 			game = new Game(numberOfHexagonsCenterRow, playerAI);
 		}
 		if(gamesRecovered != null)
-			gameController = new GameController(game, simpleGame, numberOfPlayers, playerAI, gamesRecovered.playerTurn, gamesRecovered.fileNumber);
-		else gameController = new GameController(game, simpleGame, numberOfPlayers, playerAI);
+			gameController = new GameController(game, simpleGame, numberOfPlayers, playerAI, gamesRecovered.playerTurn, gamesRecovered.fileNumber, numberRoundsAInotPlay);
+		else gameController = new GameController(game, simpleGame, numberOfPlayers, playerAI, numberRoundsAInotPlay);
 
-		if(gameController.isAIturn())
+		if(gameController.isAIturn() && gameController.isAIallowToPlay())
 			oneSearch(gameController, simpleGame);
 //		else
 		printGame();
@@ -82,20 +84,19 @@ public class Main{
 		boolean lastRound = false;
 		
 		while(!lastRound) {
-
+			
 			System.out.println();
-			System.out.println("PlayerToPlay (gameController):  " +gameController.getPlayerToPlay()+ " simpleGame AIPlayer: " +simpleGame.getPlayerAI());
-			System.out.println("PlayerToMove: " +gameController.getPlayerToMove()+ " it's AI turn? " +gameController.isAIturn());
-			System.out.println("The movements of the other player are: ");
+			System.out.println("It is time for the player " +gameController.getPlayerToPlay()+ " to play");
+			System.out.println("Play the moves");
 			System.out.println("Player 1 (White, " +(playerAI == 1 ? " AI" : " OPPONENT")+"): ");
 
-			while(!gameController.isAIturn() && gameController.getPlayerToMove() == 1)
+			while((!gameController.isAIturn() || !gameController.isAIallowToPlay()) && gameController.getPlayerToMove() == 1)
 				try { Thread.sleep(100); } catch (InterruptedException e) { e.printStackTrace();}
 			printGame();
 			
 			System.out.println("Player 2 (Black, " +(playerAI == 2 ? " AI" : " OPPONENT")+"): ");
 
-			while(!gameController.isAIturn() && gameController.getPlayerToMove() == 2)
+			while((!gameController.isAIturn() || !gameController.isAIallowToPlay()) && gameController.getPlayerToMove() == 2)
 				try { Thread.sleep(100); } catch (InterruptedException e) { e.printStackTrace();}
 			printGame();
 			System.out.println("Is this correct? Yes, No?");
@@ -104,16 +105,21 @@ public class Main{
 				gameController.undoMoves();
 			} else {
 				lastRound |= gameController.confirmMoves();
-				if(gameController.getAIPlayer() == 1 && lastRound)
-					break;
-				System.out.println(Arrays.toString(simpleGame.getGame()));
-				System.out.println("---- PlayerToPlay (gameController):  " +gameController.getPlayerToPlay()+ " simpleGame AIPlayer: " +simpleGame.getPlayerAI());
-				oneSearch(gameController, simpleGame);
-				SearchAlgorithms.numberOfSearches = 0;
-				System.out.println("--------- PlayerToPlay (gameController):  " +gameController.getPlayerToPlay()+ " simpleGame AIPlayer: " +simpleGame.getPlayerAI());
-				lastRound |= !game.isPossibleMoreRounds();
-				if(gameController.getAIPlayer() == 1 && lastRound)
-					lastRound = false;
+				System.out.println("Is AI allowed to play? : " +gameController.isAIallowToPlay()+ " is AI turn? " + gameController.isAIturn());
+				if(gameController.isAIallowToPlay() && gameController.isAIturn()) {
+					if(gameController.getAIPlayer() == 1 && lastRound)
+						break;
+					System.out.println(Arrays.toString(simpleGame.getGame()));
+					System.out.println("---- PlayerToPlay (gameController):  " +gameController.getPlayerToPlay()+ " simpleGame AIPlayer: " +simpleGame.getPlayerAI());
+					oneSearch(gameController, simpleGame);
+					SearchAlgorithms.numberOfSearches = 0;
+					System.out.println("--------- PlayerToPlay (gameController):  " +gameController.getPlayerToPlay()+ " simpleGame AIPlayer: " +simpleGame.getPlayerAI());
+					lastRound |= !game.isPossibleMoreRounds();
+					if(gameController.getAIPlayer() == 1 && lastRound)
+						lastRound = false;					
+				} else {
+					System.out.println("The AI is not allowed to play yet");
+				}
 			}
 			printGame();			
 		}
@@ -136,8 +142,8 @@ public class Main{
 		i++;
 		
 		SearchAlgorithms.initiateMovesMade(simpleGame.getGame().length);
-		String[] result = SearchAlgorithms.aspirationSearch(simpleGame, 10, depthToSearch, gameController, 12000);
-//		String[] result = SearchAlgorithms.alphaBetaWithTT(simpleGame, 2, -999999, 999999, gameController, SearchAlgorithms.getOrderedMovesMade());
+		String[] result = SearchAlgorithms.aspirationSearch(simpleGame, 10, depthToSearch, gameController, 120);
+//		String[] result = SearchAlgorithms.alphaBetaWithTT(simpleGame, depthToSearch, -999999, 999999, gameController, SearchAlgorithms.getOrderedMovesMade());
 
 //		for(int[] i: SearchAlgorithms.movesMade) {
 //			System.out.println(Arrays.toString(i));

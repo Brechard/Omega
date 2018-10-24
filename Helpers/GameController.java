@@ -33,6 +33,8 @@ public class GameController {
 	private HashMap<String, Integer> xyToIdMap = new HashMap<>();
 	private int playerAI;
 	private TextFileManager fileManager;
+	public final int numberRoundsAInotPlay;
+	private int round = 0;
 	/**
 	 * Creation of everything needed to control the game and simpleGame
 	 * @param game
@@ -40,7 +42,7 @@ public class GameController {
 	 * @param numberOfPlayers
 	 * @param firstPlayer
 	 */
-	public GameController(Game game, SimpleGame simpleGame, int numberOfPlayers, int playerAI, int playerToPlay, String numberFile) {
+	public GameController(Game game, SimpleGame simpleGame, int numberOfPlayers, int playerAI, int playerToPlay, String numberFile, int numberRoundsAInotPlay) {
 		this.game = game;
 		this.numberOfPlayers = numberOfPlayers;
 		this.playerToPlay = playerToPlay;
@@ -58,18 +60,43 @@ public class GameController {
 		else {
 			fileManager = new TextFileManager(numberFile);			
 			gameHistory = fileManager.getPlayHistory();
+			round = (int) gameHistory.size() / 2;			
 		}
-	}
-	public GameController(Game game, SimpleGame simpleGame, int numberOfPlayers, int playerAI) {
-		this(game, simpleGame, numberOfPlayers, playerAI, 1, null);
+		this.numberRoundsAInotPlay = numberRoundsAInotPlay;
 	}
 	
+	/**
+	 * Constructor for when a Game is created from scratch
+	 * @param game
+	 * @param simpleGame
+	 * @param numberOfPlayers
+	 * @param playerAI
+	 */
+	public GameController(Game game, SimpleGame simpleGame, int numberOfPlayers, int playerAI, int numberRoundsAInotPlay) {
+		this(game, simpleGame, numberOfPlayers, playerAI, 1, null, numberRoundsAInotPlay);
+	}
+
+	/**
+	 * Create a game from scratch where the AI is allow to play from the beginning
+	 * @param game
+	 * @param simpleGame
+	 * @param numberOfPlayers
+	 * @param playerAI
+	 */
+	public GameController(Game game, SimpleGame simpleGame, int numberOfPlayers, int playerAI) {
+		this(game, simpleGame, numberOfPlayers, playerAI, 1, null, 0);
+	}
+
 	/**
 	 * The AI will always be considered the player 1
 	 * @return
 	 */
 	public boolean isAIturn() {
 		return playerToPlay == playerAI;
+	}
+	
+	public boolean isAIallowToPlay() {
+		return round >= numberRoundsAInotPlay;
 	}
 	
 	public void movesForAI(String simpleGameMoves) {
@@ -106,6 +133,7 @@ public class GameController {
 		playerToMove++;
 		if(playerToMove > numberOfPlayers)
 			playerToMove = 1;
+		
 	}
 	
 	public boolean confirmMoves() {
@@ -132,8 +160,11 @@ public class GameController {
 	public void playerFinish() {
 		movesByAI = 0;
 		playerToPlay++;
-		if(playerToPlay > numberOfPlayers)
+		if(playerToPlay > numberOfPlayers) {			
 			playerToPlay = 1;
+			round++;
+			System.out.println("Round: " +round);
+		}
 		clearMoves();
 	}
 	

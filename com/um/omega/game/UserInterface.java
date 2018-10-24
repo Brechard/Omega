@@ -90,7 +90,7 @@ public class UserInterface extends JPanel implements MouseListener{
 	@Override
 	public void mouseClicked(MouseEvent e) {
 
-		if(!gameController.isAIturn()) {
+		if(!gameController.isAIturn() || !gameController.isAIallowToPlay()) {
 			for(Hexagon h: grid) {
 				if(h.contains(e.getX(), e.getY())) {
 					String move = "(" +h.getxCubePosition()+ "," + h.getyCubePosition() +")";
