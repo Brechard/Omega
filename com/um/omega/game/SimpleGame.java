@@ -95,7 +95,8 @@ public class SimpleGame {
 	}
 	
 	public long getRate() {
-		return playerAI == playerCalculate ? unionAI.getCount() - unionOpponent.getCount() : unionOpponent.getCount() - unionAI.getCount();
+		return playerAI == playerCalculate ? unionAI.getCount() - unionOpponent.getRealCount() : unionOpponent.getCount() - unionAI.getRealCount();
+//		return unionAI.getCount() - unionOpponent.getRealCount();
 //		System.out.println("Get rate of player " +playerToPlay+ " game: " +Arrays.toString(game));
 
 //		return playerToPlay == 1 ? union1.getCount() - union2.getRealCount(): union2.getCount() - union1.getRealCount();

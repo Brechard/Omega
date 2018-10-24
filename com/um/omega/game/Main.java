@@ -20,7 +20,7 @@ public class Main{
 	public static final int numberOfPlayers = 2;
 	public final static int sizeSideHexagon = 4;
 	
-	private static int depthToSearch = 1;
+	private static int depthToSearch = 5;
 	public static int numberOfHexagonsCenterRow;
 	private static JFrame frame = new JFrame("Board");
 	public static GameController gameController;
@@ -53,6 +53,7 @@ public class Main{
 			simpleGame = gamesRecovered.simpleGame;
 			game = gamesRecovered.game;
 			playerAI = simpleGame.getPlayerAI();
+			System.out.println("The AI is player " +playerAI+ ", color: " +(playerAI == 1 ? "WHITE" : "BLACK"));
 		} else {
 			System.out.println("What player is the AI?");
 			while(true) {
@@ -188,44 +189,6 @@ public class Main{
 //	}
 //	
 	static int boardN = 1;
-
-	public static void debugPrintSimpleGame(String moves, GameController2 gameController) {
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		System.out.println("Parse game with moves: " +moves);
-		Game debugGame = Parsers.parseGameFromSimpleGameMoves(moves, numberOfHexagonsCenterRow);
-//		System.out.println("Parse game with moves: " +debugGame.getPlayHistory());
-		long p1 = debugGame.getPunctuation(1);
-		long p2 = debugGame.getPunctuation(2);
-		System.out.println();
-		System.out.println("-------------------------------");
-		System.out.println("DEBUG Player 1 = " +p1+ ".");
-		System.out.println("DEBUG Player 2 = " +p2+ ".");
-		if(p1 == p2)
-			System.out.println("BOTH PLAYER HAVE THE SAME RESULT");
-		else 
-			System.out.println("THE WINNER IS PLAYER = " +(p1 > p2 ? 1 : 2)+ ".");
-		System.out.println("-------------------------------");
-		System.out.println();
-		JFrame frame = new JFrame("Debug board " +boardN++);
-		Debug.UserInterface ui = new Debug.UserInterface(boardSize, numberOfHexagonsCenterRow, debugGame, gameController);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.add(ui);
-		frame.setSize(boardSize, boardSize);
-		frame.setVisible(true);
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-	}
-
 	
 	public static void debugPrintSimpleGame(String moves, GameController gameController) {
 		try {
