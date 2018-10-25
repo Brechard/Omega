@@ -55,8 +55,8 @@ public class UnionFind {
 		for(int i = 0; i < parent.length; i++) {
 			if(parent[i] == i) { // He is the root
 				rate *= size[i];
-				if(size[i] != 1)
-					bigGroups += Math.abs(size[i] - 3) * Math.E;
+				if(size[i] > 3)
+					bigGroups += size[i] - 3;
 			}
 		}
 		return rate - bigGroups;

@@ -20,7 +20,6 @@ public class SearchAlgorithms {
 	public static long prunings = 0;
 	public static int[][] movesMade;
 	private static boolean calculate = true;
-	private static final int minimumAspirationDepth = 3;
 		
 	public static String[] aspirationSearch(SimpleGame game, int delta, int maxDepth, GameController gameController, final int counter) {
 		System.out.println("Start the search, depth: " +maxDepth+ ", the playerToPlay in game is: " +gameController.getPlayerToPlay()+ " AI player: " +game.getPlayerAI());
@@ -42,7 +41,7 @@ public class SearchAlgorithms {
 			}
 		};
 		counterThread.start();
-		for(int depth = minimumAspirationDepth; depth <= maxDepth; depth++ ) {
+		for(int depth = (maxDepth / 2) + 1; depth <= maxDepth; depth++ ) {
 			long alpha = - delta; 
 			long beta = + delta;
 			numberOfSearches = 0;

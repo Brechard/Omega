@@ -83,7 +83,7 @@ public class TextFileManager {
 	
 	public static Games recoverLastGame() {
 		File[] files = new File("history/").listFiles();
-		return recoverGame("history/" +files[files.length - 1].getName());
+		return recoverGame(files[files.length - 1].getName());
 	}
 	
 	public static Games recoverGame(String fileName) {
@@ -93,7 +93,7 @@ public class TextFileManager {
 		SimpleGame simpleGame = null;
 		Game game = null;
 		try {
-			fr = new FileReader(fileName);
+			fr = new FileReader("history/" +fileName);
 			br = new BufferedReader(fr);
 			
 			String sCurrentLine = br.readLine();
@@ -108,7 +108,7 @@ public class TextFileManager {
 				game.uniteMoveConfirmed(Integer.valueOf(sCurrentLine.split(",")[0]), Integer.valueOf(sCurrentLine.split(",")[2]), Integer.valueOf(sCurrentLine.split(",")[3]));
 			}
 			
-			String fileNumber = fileName.replace(".txt", "").replace("history/gameHistory_JavaFriendly", "");
+			String fileNumber = fileName.replace(".txt", "").replace("history/", "").replace("gameHistory_JavaFriendly", "");
 			games = new Games(simpleGame, game, movesDone / 2 % 2 == 0 ? 1 : 2, fileNumber);
 		} catch (IOException e) {
 			e.printStackTrace();

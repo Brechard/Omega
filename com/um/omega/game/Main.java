@@ -5,8 +5,6 @@ import java.util.Scanner;
 
 import javax.swing.JFrame;
 
-import Debug.GameController2;
-import Debug.SearchAlgorithms2;
 import Helpers.GameController;
 import Helpers.Parsers;
 import Helpers.TextFileManager;
@@ -20,7 +18,7 @@ public class Main{
 	public static final int numberOfPlayers = 2;
 	public final static int sizeSideHexagon = 5;
 	
-	private static int depthToSearch = 3;
+	private static int depthToSearch = 4;
 	public static int numberOfHexagonsCenterRow;
 	private static JFrame frame = new JFrame("Board");
 	public static GameController gameController;
@@ -33,12 +31,16 @@ public class Main{
 
 		numberOfHexagonsCenterRow = sizeSideHexagon * 2 - 1;
 
-		play(recoverLastGame(true));
+		play(recoverLastGame(false));
 		
 //		playAIvsAI();
 
 //		debug(depthToSearch);
 		
+	}
+	
+	public static Games recoverGame(String game) {
+		return TextFileManager.recoverGame(game);		
 	}
 	
 	public static Games recoverLastGame(boolean recover) {
@@ -55,7 +57,9 @@ public class Main{
 			simpleGame = gamesRecovered.simpleGame;
 			game = gamesRecovered.game;
 			playerAI = simpleGame.getPlayerAI();
+			printGameDebug();
 			System.out.println("The AI is player " +playerAI+ ", color: " +(playerAI == 1 ? "WHITE" : "BLACK"));
+//			return;
 		} else {
 			System.out.println("What player is the AI?");
 			while(true) {
@@ -142,20 +146,9 @@ public class Main{
 		i++;
 		
 		SearchAlgorithms.initiateMovesMade(simpleGame.getGame().length);
-		String[] result = SearchAlgorithms.aspirationSearch(simpleGame, 10, depthToSearch, gameController, 120);
+		String[] result = SearchAlgorithms.aspirationSearch(simpleGame, 2000, depthToSearch, gameController, 240);
 //		String[] result = SearchAlgorithms.alphaBetaWithTT(simpleGame, depthToSearch, -999999, 999999, gameController, SearchAlgorithms.getOrderedMovesMade());
 
-//		for(int[] i: SearchAlgorithms.movesMade) {
-//			System.out.println(Arrays.toString(i));
-//		}
-//		System.out.println("-------");
-//		for(int[] i: SearchAlgorithms.getOrderedMovesMade()) {
-//			System.out.println(Arrays.toString(i));
-//		}
-			
-//		String[] result = SearchAlgorithms.alphaBetaWithTT(simpleGame, depthToSearch, -99999999, 99999999, gameController, -1);
-//		String[] result = SearchAlgorithms.aspirationSearch(simpleGame, 10, depthToSearch, gameController);		
-//		String[] result = SearchAlgorithms.alphaBetaWithTT(game, depthToSearch, -99999999, 99999999);
 		long  endTime = System.currentTimeMillis();
 		double duration = (endTime - startTime) * 0.001;  
 		int minutes = (int) duration/60;
@@ -235,6 +228,15 @@ public class Main{
 
 	public static void printGame() {
 		printGame(game);
+	}
+	
+	public static void printGameDebug() {
+		JFrame frame = new JFrame("Board FOR DEBUG");
+		UserInterface ui = new UserInterface(boardSize, numberOfHexagonsCenterRow, game, gameController);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.add(ui);
+		frame.setSize(boardSize, boardSize);
+		frame.setVisible(true);
 	}
 	
 	public static void printGame(Game game) {
