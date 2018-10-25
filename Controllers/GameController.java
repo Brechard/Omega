@@ -1,4 +1,4 @@
-package Helpers;
+package Controllers;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -10,7 +10,11 @@ import java.util.HashSet;
 import com.um.omega.game.Cell;
 import com.um.omega.game.Game;
 import com.um.omega.game.Main;
+import com.um.omega.game.SearchAlgorithms;
 import com.um.omega.game.SimpleGame;
+
+import Helpers.Parsers;
+import Helpers.TextFileManager;
 
 public class GameController {
 	
@@ -35,6 +39,7 @@ public class GameController {
 	private TextFileManager fileManager;
 	public final int numberRoundsAInotPlay;
 	private int round = 0;
+	private SearchController searchController;
 	/**
 	 * Creation of everything needed to control the game and simpleGame
 	 * @param game
@@ -42,7 +47,7 @@ public class GameController {
 	 * @param numberOfPlayers
 	 * @param firstPlayer
 	 */
-	public GameController(Game game, SimpleGame simpleGame, int numberOfPlayers, int playerAI, int playerToPlay, String numberFile, int numberRoundsAInotPlay) {
+	public GameController(Game game, SimpleGame simpleGame, int numberOfPlayers, int playerAI, int playerToPlay, String numberFile, int numberRoundsAInotPlay, int initialDepthToSearch) {
 		this.game = game;
 		this.numberOfPlayers = numberOfPlayers;
 		this.playerToPlay = playerToPlay;
@@ -63,6 +68,7 @@ public class GameController {
 			round = (int) gameHistory.size() / 2;			
 		}
 		this.numberRoundsAInotPlay = numberRoundsAInotPlay;
+		this.searchController = new SearchController(simpleGame, this, initialDepthToSearch);
 	}
 	
 	/**
@@ -72,8 +78,8 @@ public class GameController {
 	 * @param numberOfPlayers
 	 * @param playerAI
 	 */
-	public GameController(Game game, SimpleGame simpleGame, int numberOfPlayers, int playerAI, int numberRoundsAInotPlay) {
-		this(game, simpleGame, numberOfPlayers, playerAI, 1, null, numberRoundsAInotPlay);
+	public GameController(Game game, SimpleGame simpleGame, int numberOfPlayers, int playerAI, int numberRoundsAInotPlay, int initialDepthToSearch) {
+		this(game, simpleGame, numberOfPlayers, playerAI, 1, null, numberRoundsAInotPlay, initialDepthToSearch);
 	}
 
 	/**
@@ -84,7 +90,7 @@ public class GameController {
 	 * @param playerAI
 	 */
 	public GameController(Game game, SimpleGame simpleGame, int numberOfPlayers, int playerAI) {
-		this(game, simpleGame, numberOfPlayers, playerAI, 1, null, 0);
+		this(game, simpleGame, numberOfPlayers, playerAI, 1, null, 0, 1);
 	}
 
 	/**
@@ -97,6 +103,17 @@ public class GameController {
 	
 	public boolean isAIallowToPlay() {
 		return round >= numberRoundsAInotPlay;
+	}
+	
+	public void playForAI() {
+		movesForAI(searchController.startSearching());
+		System.out.println("Player 1 = " +game.getPunctuation(1)+ ".");
+		System.out.println("Player 2 = " +game.getPunctuation(2)+ ".");
+		SearchAlgorithms.numberOfSearches = 0;
+	}
+	
+	public void startSearchingWhileOpponentThinks() {
+		searchController.calculateWhileOtherPlays();
 	}
 	
 	public void movesForAI(String simpleGameMoves) {

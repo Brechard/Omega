@@ -7,7 +7,7 @@ import java.util.HashMap;
 
 import javax.swing.text.html.MinimalHTMLWriter;
 
-import Helpers.GameController;
+import Controllers.GameController;
 import Helpers.Parsers;
 import ObjectsToHelp.Flag;
 import ObjectsToHelp.TTInfo;
@@ -20,9 +20,11 @@ public class SearchAlgorithms {
 	public static long prunings = 0;
 	public static int[][] movesMade;
 	private static boolean calculate = true;
+	public static boolean searching = false;
 		
 	public static String[] aspirationSearch(SimpleGame game, int delta, int maxDepth, GameController gameController, final int counter) {
 		System.out.println("Start the search, depth: " +maxDepth+ ", the playerToPlay in game is: " +gameController.getPlayerToPlay()+ " AI player: " +game.getPlayerAI());
+		searching = true;
 //		System.out.println("Is it possible to keep playing?" +(game.emptyCells.size() < 4)+ " and " +(game.playerToPlay == Main.gameController.getFirstPlayer()));
 		String[] result = null;
 		String[] newResult = null;
@@ -33,7 +35,7 @@ public class SearchAlgorithms {
 			public void run() {
 				try {
 					Thread.sleep(counter * 1000);
-					finishCalculating();
+					finishCalculating(true);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -41,7 +43,7 @@ public class SearchAlgorithms {
 			}
 		};
 		counterThread.start();
-		for(int depth = (maxDepth / 2) + 1; depth <= maxDepth; depth++ ) {
+		for(int depth = 1; depth <= maxDepth; depth++ ) {
 			long alpha = - delta; 
 			long beta = + delta;
 			numberOfSearches = 0;
@@ -51,22 +53,22 @@ public class SearchAlgorithms {
 			
 //			Main.debugPrintSimpleGame(newResult[1], gameController);;
 			long score = Long.valueOf(newResult[0]);
-			System.out.println("For depth " +depth+ " the result is: " +Arrays.toString(newResult));
+//			System.out.println("For depth " +depth+ " the result is: " +Arrays.toString(newResult));
 			if(newResult[1] == null || newResult[1] == "" || (result != null && newResult[1].length() < result[1].length())) {
-				System.out.println("For depth " +depth+ " the result is an error");
+//				System.out.println("For depth " +depth+ " the result is an error");
 				break;
 			}
 			result = newResult;
 			if( score >= beta ) {
 				alpha = score; 
 				beta = (long) Long.MAX_VALUE;
-				System.out.println("Failed high " +depth+ " alpha: " +alpha+ " beta: " +beta);
+//				System.out.println("Failed high " +depth+ " alpha: " +alpha+ " beta: " +beta);
 				result = alphaBetaWithTT(game, depth, alpha, beta, gameController, moves);
 				score = Long.valueOf(result[0]);
 			} else if( score <= alpha ) {
 				alpha  = (long) Long.MIN_VALUE;
 				beta = score;
-				System.out.println("Failed low " +depth+ " alpha: " +alpha+ " beta: " +beta);
+//				System.out.println("Failed low " +depth+ " alpha: " +alpha+ " beta: " +beta);
 				result = alphaBetaWithTT(game, depth, alpha, beta, gameController, moves);
 				score = Long.valueOf(result[0]);
 			}
@@ -77,6 +79,7 @@ public class SearchAlgorithms {
 //			System.out.println("-------");
 		}
 		counterThread.stop();
+		searching = false;
 		return result;
 	}
 
@@ -170,8 +173,9 @@ public class SearchAlgorithms {
 		hashMap = new HashMap<Long, TTInfo>();
 	}
 	
-	public static void finishCalculating() {
-		System.out.println("TAKING TOO LONG, STOP");
+	public static void finishCalculating(boolean timerOut) {
+		if(timerOut)
+			System.out.println("TAKING TOO LONG, STOP");
 		calculate = false;
 	}
 

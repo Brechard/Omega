@@ -52,14 +52,17 @@ public class UnionFind {
 	public long getCount() {
 		long rate = 1;
 		long bigGroups = 0;
+		int numberOfGroups = 1;
 		for(int i = 0; i < parent.length; i++) {
 			if(parent[i] == i) { // He is the root
 				rate *= size[i];
+				if(size[i] > 1)
+					numberOfGroups++;
 				if(size[i] > 3)
 					bigGroups += size[i] - 3;
 			}
 		}
-		return rate - bigGroups;
+		return rate - bigGroups + numberOfGroups * 200;
 	}	
 	public long getRealCount() {
 		long rate = 1;

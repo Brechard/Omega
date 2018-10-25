@@ -94,7 +94,7 @@ public class SimpleGame {
 		game[cellId] = 0;
 	}
 	
-	public long getRate() {		
+	public long getRate() {
 		return playerAI == playerCalculate ? unionAI.getCount() - unionOpponent.getRealCount() : unionOpponent.getCount() - unionAI.getRealCount();
 	}
 	

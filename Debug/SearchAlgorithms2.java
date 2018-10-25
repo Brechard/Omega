@@ -7,7 +7,7 @@ import java.util.HashMap;
 
 import com.um.omega.game.SimpleGame;
 
-import Helpers.GameController;
+import Controllers.GameController;
 import Helpers.Parsers;
 import ObjectsToHelp.Flag;
 import ObjectsToHelp.TTInfo;

@@ -15,7 +15,7 @@ import com.um.omega.game.Cell;
 import com.um.omega.game.Game;
 import com.um.omega.game.Hexagon;
 
-import Helpers.GameController;
+import Controllers.GameController;
 import Helpers.Moves;
 import Helpers.Parsers;
 

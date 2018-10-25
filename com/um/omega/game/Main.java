@@ -5,20 +5,20 @@ import java.util.Scanner;
 
 import javax.swing.JFrame;
 
-import Helpers.GameController;
+import Controllers.GameController;
 import Helpers.Parsers;
 import Helpers.TextFileManager;
 import ObjectsToHelp.Games;
 
 public class Main{
 	
-	public final static int boardSize = 800;
+	public final static int boardSize = 900;
 	public static Game game;
 	public static SimpleGame simpleGame;
 	public static final int numberOfPlayers = 2;
 	public final static int sizeSideHexagon = 5;
 	
-	private static int depthToSearch = 4;
+	private static int initialDepthToSearch = 4;
 	public static int numberOfHexagonsCenterRow;
 	private static JFrame frame = new JFrame("Board");
 	public static GameController gameController;
@@ -31,7 +31,7 @@ public class Main{
 
 		numberOfHexagonsCenterRow = sizeSideHexagon * 2 - 1;
 
-		play(recoverLastGame(false));
+		play(recoverLastGame(true));
 		
 //		playAIvsAI();
 
@@ -76,11 +76,12 @@ public class Main{
 			game = new Game(numberOfHexagonsCenterRow, playerAI);
 		}
 		if(gamesRecovered != null)
-			gameController = new GameController(game, simpleGame, numberOfPlayers, playerAI, gamesRecovered.playerTurn, gamesRecovered.fileNumber, numberRoundsAInotPlay);
-		else gameController = new GameController(game, simpleGame, numberOfPlayers, playerAI, numberRoundsAInotPlay);
+			gameController = new GameController(game, simpleGame, numberOfPlayers, playerAI, gamesRecovered.playerTurn, gamesRecovered.fileNumber, numberRoundsAInotPlay, initialDepthToSearch);
+		else gameController = new GameController(game, simpleGame, numberOfPlayers, playerAI, numberRoundsAInotPlay, initialDepthToSearch);
 
 		if(gameController.isAIturn() && gameController.isAIallowToPlay())
-			oneSearch(gameController, simpleGame);
+			gameController.playForAI();
+		else gameController.startSearchingWhileOpponentThinks();
 //		else
 		printGame();
 		System.out.println(Arrays.toString(simpleGame.getGame()));
@@ -115,14 +116,14 @@ public class Main{
 						break;
 					System.out.println(Arrays.toString(simpleGame.getGame()));
 					System.out.println("---- PlayerToPlay (gameController):  " +gameController.getPlayerToPlay()+ " simpleGame AIPlayer: " +simpleGame.getPlayerAI());
-					oneSearch(gameController, simpleGame);
-					SearchAlgorithms.numberOfSearches = 0;
+					gameController.playForAI();
 					System.out.println("--------- PlayerToPlay (gameController):  " +gameController.getPlayerToPlay()+ " simpleGame AIPlayer: " +simpleGame.getPlayerAI());
 					lastRound |= !game.isPossibleMoreRounds();
 					if(gameController.getAIPlayer() == 1 && lastRound)
 						lastRound = false;					
 				} else {
 					System.out.println("The AI is not allowed to play yet");
+					gameController.startSearchingWhileOpponentThinks();
 				}
 			}
 			printGame();			
@@ -133,60 +134,6 @@ public class Main{
 	
 	public static int i = 0;
 
-	public static String[] oneSearch(GameController gameController, SimpleGame simpleGame) {
-		System.out.println();
-		System.out.println("Calculating ...");
-		long startTime = System.currentTimeMillis();
-
-//		System.out.println("Is "+i+" even? " +((i & 1) == 0)+ " depth: " +depthToSearch);
-		if((i & 1) == 0 && i != 0) {
-			depthToSearch++;
-			System.out.println("DEPTH AUGMENTED TO "+depthToSearch);
-		}
-		i++;
-		
-		SearchAlgorithms.initiateMovesMade(simpleGame.getGame().length);
-		String[] result = SearchAlgorithms.aspirationSearch(simpleGame, 2000, depthToSearch, gameController, 240);
-//		String[] result = SearchAlgorithms.alphaBetaWithTT(simpleGame, depthToSearch, -999999, 999999, gameController, SearchAlgorithms.getOrderedMovesMade());
-
-		long  endTime = System.currentTimeMillis();
-		double duration = (endTime - startTime) * 0.001;  
-		int minutes = (int) duration/60;
-		System.out.println("It took " +minutes+ " minutes " +(duration - minutes * 60) +" s to calculate it.");
-		System.out.println("Number of searches: " +SearchAlgorithms.numberOfSearches+ " and prunes: " +SearchAlgorithms.prunings);
-		System.out.println("Response: " +Arrays.asList(result));
-
-		gameController.movesForAI(result[1]);
-		debugPrintSimpleGame(result[1], gameController);
-		System.out.println("Player 1 = " +game.getPunctuation(1)+ ".");
-		System.out.println("Player 2 = " +game.getPunctuation(2)+ ".");
-		return result;
-
-	}
-	
-//	public static void multipleSearch(int n) {
-//		long startTime;
-//		long endTime;
-//		double duration;
-//		int minutes;
-//		double totalDuration = 0;
-//		for(int i = 0; i < n; i++) {
-////			numberOfSearches = 0;
-//			startTime = System.currentTimeMillis();
-//			SearchAlgorithms.aspirationSearch(game, 10, depthToSearch);		
-//			SearchAlgorithms.cleanHashMap();
-//			endTime = System.currentTimeMillis();
-//			duration = (endTime - startTime) * 0.001;  
-//			minutes = (int) duration/60;
-//			totalDuration += duration;
-////			System.out.println("The algorithm has done: " +numberOfSearches+ " searches");
-//			System.out.println("Launch " +i+ " of the algorithm took " +minutes+ " minutes " +(duration - minutes * 60) +" s to finish.");
-//		}
-//		double avg = totalDuration / n;
-//		minutes = (int) avg/60;
-//		System.out.println("Doing " +n+ " searches, the average time was: " +avg+ ", meaning: " +minutes+ " minutes " +(avg - minutes * 60) +" s");
-//	}
-//	
 	static int boardN = 1;
 	
 	public static void debugPrintSimpleGame(String moves, GameController gameController) {

@@ -10,6 +10,7 @@ import com.um.omega.game.Game;
 import com.um.omega.game.Main;
 import com.um.omega.game.UserInterface;
 
+import Controllers.GameController;
 import Debug.GameController2;
 
 public class Parsers {
@@ -52,7 +53,7 @@ public class Parsers {
 						Integer.valueOf(cellData[1]), 				// x
 						Integer.valueOf(cellData[2]), 				// y
 						Integer.valueOf(cellData[3]));				// cellId
-				System.out.println("The next move for player " +cellData[0]+ ", is: (" +cellData[1]+ ", " +cellData[2]+ ")");
+				System.out.println("The next move for player " +cellData[0]+ ", is: (" +cellData[1]+ ", " +cellData[2]+ ") with CellID: " +cellData[3]);
 			}
 		} else {
 			System.out.println();

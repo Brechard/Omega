@@ -9,7 +9,7 @@ import com.um.omega.game.SearchAlgorithms;
 import com.um.omega.game.SimpleGame;
 import com.um.omega.game.UserInterface;
 
-import Helpers.GameController;
+import Controllers.GameController;
 import Helpers.Parsers;
 
 public class PlayGame {

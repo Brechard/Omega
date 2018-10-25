@@ -11,7 +11,7 @@ import java.util.ArrayList;
 
 import javax.swing.JPanel;
 
-import Helpers.GameController;
+import Controllers.GameController;
 import Helpers.Moves;
 import Helpers.Parsers;
 
