@@ -11,16 +11,17 @@ public class SearchController {
 	public SimpleGame simpleGame;
 	public GameController gameController;
 	public int depthToSearch;
-	// The game can last only 15 minutes
-	public final int timeOfGame = 15 * 60;
+	// The game can last only 15 minutes but we have to considering the time used to tell the stones to the opponent
+	public final int timeOfGame = 10 * 60;
 	public double timeLeftAI = timeOfGame;
 	public double timeLeftOpponent = timeOfGame;
 	private int roundSearching = 0;
-	public SearchController(SimpleGame  simpleGame, GameController gameController, int initialDepthToSearch) {
+	public SearchController(SimpleGame  simpleGame, GameController gameController, int initialDepthToSearch, int roundSearching) {
 		this.simpleGame = simpleGame;
 		this.gameController = gameController;  
 		depthToSearch = initialDepthToSearch;
 		SearchAlgorithms.initiateMovesMade(simpleGame.getGame().length);
+		this.roundSearching = roundSearching;
 	}
 	
 	public String[] startAlphaBetaSearch() {
@@ -33,20 +34,20 @@ public class SearchController {
 	}
 	
 	public void calculateWhileOtherPlays() {
-		finishPreviousCalculating();
-		Thread searchThread = new Thread() {
-			public void run() {
-				long startTime = System.currentTimeMillis();
-				SearchAlgorithms.aspirationSearch(simpleGame, 1000, 10, gameController, timeOfGame);				
-				long  endTime = System.currentTimeMillis();
-				double duration = (endTime - startTime) * 0.001;  
-				if(gameController.isAIturn()) // Because this finishes once it is AI turn again
-					timeLeftOpponent -= duration;
-				int minutes = (int) timeLeftOpponent/60;
-				System.out.println("The opponent has " +minutes+ " minutes " +(timeLeftOpponent - minutes * 60) +" s left of game time.");
-			}
-		};
-		searchThread.start();
+//		finishPreviousCalculating();
+//		Thread searchThread = new Thread() {
+//			public void run() {
+//				long startTime = System.currentTimeMillis();
+//				SearchAlgorithms.aspirationSearch(simpleGame, 1000, 10, gameController, timeOfGame);				
+//				long  endTime = System.currentTimeMillis();
+//				double duration = (endTime - startTime) * 0.001;  
+//				if(gameController.isAIturn()) // Because this finishes once it is AI turn again
+//					timeLeftOpponent -= duration;
+//				int minutes = (int) timeLeftOpponent/60;
+//				System.out.println("The opponent has " +minutes+ " minutes " +(timeLeftOpponent - minutes * 60) +" s left of game time.");
+//			}
+//		};
+//		searchThread.start();
 	}
 	
 	public String startSearching() {
@@ -54,15 +55,17 @@ public class SearchController {
 		System.out.println("Calculating ...");
 		long startTime = System.currentTimeMillis();
 		if((roundSearching & 1) == 0 && roundSearching != 0) {
-//			depthToSearch++;
+			depthToSearch++;
 			System.out.println("DEPTH AUGMENTED TO "+depthToSearch);
 		}
 		
 		// Use of a variation of the Gaussian function to calculate the maximum time available considering that there are 15 rounds
-		// y = exp(-(-15+x)^2/(9)/(3*sqrt(2*pi))
+		// y = exp(-(-14+x)^2/(9)/(3*sqrt(2*pi))
 		int maxTime = (int) (timeLeftAI * Math.exp(-Math.pow((-15+roundSearching), 2)/(9)/(3*Math.sqrt(2*Math.PI))));
 //		int maxTime = 60;
-		String[] result = startAspirationSearch(1000, 120);
+		if(maxTime < 10)
+			maxTime = 20;
+		String[] result = startAspirationSearch(1000, maxTime);
 		roundSearching++;
 		
 		long  endTime = System.currentTimeMillis();

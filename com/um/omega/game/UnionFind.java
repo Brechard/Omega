@@ -63,7 +63,8 @@ public class UnionFind {
 			}
 		}
 		return rate - bigGroups + numberOfGroups * 200;
-	}	
+	}
+		
 	public long getRealCount() {
 		long rate = 1;
 		for(int i = 0; i < parent.length; i++) {

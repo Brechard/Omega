@@ -70,7 +70,7 @@ public class GameController {
 			round = (int) gameHistory.size() / 2;			
 		}
 		this.numberRoundsAInotPlay = numberRoundsAInotPlay;
-		this.searchController = new SearchController(simpleGame, this, initialDepthToSearch);
+		this.searchController = new SearchController(simpleGame, this, initialDepthToSearch, round);
 	}
 	
 	/**

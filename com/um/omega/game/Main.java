@@ -18,11 +18,11 @@ public class Main{
 	public static final int numberOfPlayers = 2;
 	public final static int sizeSideHexagon = 5;
 	
-	private static int initialDepthToSearch = 3;
+	private static int initialDepthToSearch = 2;
 	public static int numberOfHexagonsCenterRow;
 	private static JFrame frame = new JFrame("Board");
 	public static GameController gameController;
-	private static int numberRoundsAInotPlay = 4;
+	private static int numberRoundsAInotPlay = 0;
 
 	// private static int numberOfSearches = 0;
 	// Check Bitboard
@@ -31,7 +31,7 @@ public class Main{
 
 		numberOfHexagonsCenterRow = sizeSideHexagon * 2 - 1;
 
-		play(recoverLastGame(false));
+		play(recoverLastGame(true));
 		
 //		Debug.PlayGame.playAIvsAI();
 

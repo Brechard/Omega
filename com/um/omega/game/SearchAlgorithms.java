@@ -89,7 +89,7 @@ public class SearchAlgorithms {
 		numberOfSearches++;
 		long originalAlpha = alpha;
 		long hash = gameController.getHash(game.getGame());
-
+		
 		if(hashMap.containsKey(hash) && hashMap.get(hash).depth >= depth) {
 			TTInfo gameInfo = hashMap.get(hash);
 			

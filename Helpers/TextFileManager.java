@@ -49,7 +49,7 @@ public class TextFileManager {
 			fr = new FileReader("history/gameHistory_JavaFriendly" +numberFile+ ".txt");
 			br = new BufferedReader(fr);
 			String sCurrentLine = br.readLine();
-			while ((sCurrentLine = br.readLine()) != null) {
+			while ((sCurrentLine = br.readLine()) != null && !sCurrentLine.equals("")) {
 				gameHistory.add("(" +sCurrentLine.split(",")[0]+ ", " 
 						+sCurrentLine.split(",")[2]+ ", " 
 						+sCurrentLine.split(",")[3]+ ", " 
@@ -101,7 +101,7 @@ public class TextFileManager {
 			simpleGame = new SimpleGame(Integer.valueOf(sCurrentLine.split(",")[0]), Integer.valueOf(sCurrentLine.split(",")[1]));
 			game = new Game(Integer.valueOf(sCurrentLine.split(",")[0]) * 2 - 1, Integer.valueOf(sCurrentLine.split(",")[1]));
 			int movesDone = 0;
-			while ((sCurrentLine = br.readLine()) != null && sCurrentLine != "") {
+			while ((sCurrentLine = br.readLine()) != null && !sCurrentLine.equals("")) {
 				movesDone++;
 				simpleGame.makeMove(Integer.valueOf(sCurrentLine.split(",")[0]), Integer.valueOf(sCurrentLine.split(",")[1]));
 				game.setCellToPlayer(Integer.valueOf(sCurrentLine.split(",")[0]), Integer.valueOf(sCurrentLine.split(",")[2]), Integer.valueOf(sCurrentLine.split(",")[3]));
