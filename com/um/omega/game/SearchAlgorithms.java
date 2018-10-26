@@ -23,7 +23,10 @@ public class SearchAlgorithms {
 	public static boolean searching = false;
 		
 	public static String[] aspirationSearch(SimpleGame game, int delta, int maxDepth, GameController gameController, final int counter) {
-		System.out.println("Start the search, depth: " +maxDepth+ ", the playerToPlay in game is: " +gameController.getPlayerToPlay()+ " AI player: " +game.getPlayerAI());
+		int minutes = counter/60;
+		System.out.println("Start the search, depth: " +maxDepth+ " for AI player: " +game.getPlayerAI()
+			+ " with a maximum time to calculate it of " +minutes+ " minutes " +(counter - minutes*60)+ "s");
+		System.out.println("GAME USED IN SEARCH: " +game.getPlayHistory());
 		searching = true;
 //		System.out.println("Is it possible to keep playing?" +(game.emptyCells.size() < 4)+ " and " +(game.playerToPlay == Main.gameController.getFirstPlayer()));
 		String[] result = null;
@@ -37,13 +40,12 @@ public class SearchAlgorithms {
 					Thread.sleep(counter * 1000);
 					finishCalculating(true);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}						
 			}
 		};
 		counterThread.start();
-		for(int depth = 1; depth <= maxDepth; depth++ ) {
+		for(int depth = 2; depth <= maxDepth; depth++ ) {
 			long alpha = - delta; 
 			long beta = + delta;
 			numberOfSearches = 0;
@@ -53,9 +55,9 @@ public class SearchAlgorithms {
 			
 //			Main.debugPrintSimpleGame(newResult[1], gameController);;
 			long score = Long.valueOf(newResult[0]);
-//			System.out.println("For depth " +depth+ " the result is: " +Arrays.toString(newResult));
+			System.out.println("For depth " +depth+ " the result is: " +Arrays.toString(newResult));
 			if(newResult[1] == null || newResult[1] == "" || (result != null && newResult[1].length() < result[1].length())) {
-//				System.out.println("For depth " +depth+ " the result is an error");
+				System.out.println("For depth " +depth+ " the result is an error");
 				break;
 			}
 			result = newResult;

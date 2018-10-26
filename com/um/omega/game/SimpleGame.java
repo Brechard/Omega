@@ -212,6 +212,11 @@ public class SimpleGame {
 	public int getPlayerToMove() {
 		return playerToMove;
 	}
+	
+	public SimpleGame setAIPlayer(int player) {
+		playerAI = player;
+		return this;
+	}
 }
 
 

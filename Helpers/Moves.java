@@ -3,17 +3,18 @@ package Helpers;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import com.um.omega.game.Game;
 import com.um.omega.game.Main;
 import Helpers.Parsers;;
 
 public class Moves {
 			
-	public static void deleteMovesNotDone(ArrayList<String> moves){
+	public static void deleteMovesNotDone(ArrayList<String> moves, Game game){
 		moves.remove(1);
 		moves.remove(0);
 		for(String move: moves) {
 			String[] cellData = move.replace("(", "").replace(")", "").replace(" ", "").split(",");
-			Main.game.deleteMove(Integer.valueOf(cellData[0]), Integer.valueOf(cellData[1]), Integer.valueOf(cellData[2]));
+			game.deleteMove(Integer.valueOf(cellData[0]), Integer.valueOf(cellData[1]), Integer.valueOf(cellData[2]));
 		}
 	}
 

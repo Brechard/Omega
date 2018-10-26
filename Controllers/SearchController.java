@@ -25,12 +25,11 @@ public class SearchController {
 	
 	public String[] startAlphaBetaSearch() {
 		SearchAlgorithms.initiateMovesMade(simpleGame.getGame().length);
-		return SearchAlgorithms.alphaBetaWithTT(simpleGame, depthToSearch, -999999, 999999, gameController, SearchAlgorithms.getOrderedMovesMade());
+		return SearchAlgorithms.alphaBetaWithTT(simpleGame.setAIPlayer(gameController.playerAI), depthToSearch, -999999, 999999, gameController, SearchAlgorithms.getOrderedMovesMade());
 	}
 	
-	public String[] startAspirationSearch(int window) {
-		int maximumTime = 120;
-		return SearchAlgorithms.aspirationSearch(simpleGame, window, depthToSearch, gameController, maximumTime);
+	public String[] startAspirationSearch(int window, int maxTime) {
+		return SearchAlgorithms.aspirationSearch(simpleGame.setAIPlayer(gameController.playerOpponent), window, depthToSearch, gameController, maxTime);
 	}
 	
 	public void calculateWhileOtherPlays() {
@@ -41,7 +40,8 @@ public class SearchController {
 				SearchAlgorithms.aspirationSearch(simpleGame, 1000, 10, gameController, timeOfGame);				
 				long  endTime = System.currentTimeMillis();
 				double duration = (endTime - startTime) * 0.001;  
-				timeLeftOpponent -= duration;
+				if(gameController.isAIturn()) // Because this finishes once it is AI turn again
+					timeLeftOpponent -= duration;
 				int minutes = (int) timeLeftOpponent/60;
 				System.out.println("The opponent has " +minutes+ " minutes " +(timeLeftOpponent - minutes * 60) +" s left of game time.");
 			}
@@ -54,11 +54,15 @@ public class SearchController {
 		System.out.println("Calculating ...");
 		long startTime = System.currentTimeMillis();
 		if((roundSearching & 1) == 0 && roundSearching != 0) {
-			depthToSearch++;
+//			depthToSearch++;
 			System.out.println("DEPTH AUGMENTED TO "+depthToSearch);
 		}
-
-		String[] result = startAspirationSearch(1000);
+		
+		// Use of a variation of the Gaussian function to calculate the maximum time available considering that there are 15 rounds
+		// y = exp(-(-15+x)^2/(9)/(3*sqrt(2*pi))
+		int maxTime = (int) (timeLeftAI * Math.exp(-Math.pow((-15+roundSearching), 2)/(9)/(3*Math.sqrt(2*Math.PI))));
+//		int maxTime = 60;
+		String[] result = startAspirationSearch(1000, 120);
 		roundSearching++;
 		
 		long  endTime = System.currentTimeMillis();
@@ -70,7 +74,6 @@ public class SearchController {
 		System.out.println("The AI has " +minutesAI+ " minutes " +(timeLeftAI - minutesAI * 60) +" s left of game time.");
 		System.out.println("Number of searches: " +SearchAlgorithms.numberOfSearches+ " and prunes: " +SearchAlgorithms.prunings);
 		System.out.println("Response: " +Arrays.asList(result));
-		calculateWhileOtherPlays();
 		return result[1];
 	}
 	

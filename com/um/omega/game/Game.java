@@ -69,7 +69,7 @@ public class Game {
 		createNeighbours();
 		union1 = new UnionFind(emptyCells.size());
 		union2 = new UnionFind(emptyCells.size());
-//		System.out.println("The empty cells are: ");
+//		System.out.println("The empty cells are: " + numberOfHexagonsCenterRow);
 //		for(Cell c: emptyCells)
 //			System.out.print(c.print());
 //		System.out.println();

@@ -62,7 +62,7 @@ public class Parsers {
 			System.out.println("-------------");
 			System.out.println();
 		}
-		Moves.deleteMovesNotDone(newMoves);
+		Moves.deleteMovesNotDone(newMoves, gameController.getGame());
 	}
 	
 	public static void parseNextMove(String s, GameController2 gameController) {
@@ -88,7 +88,7 @@ public class Parsers {
 			System.out.println("-------------");
 			System.out.println();
 		}
-		Moves.deleteMovesNotDone(newMoves);
+		Moves.deleteMovesNotDone(newMoves, gameController.getGame());
 	}
 
 	

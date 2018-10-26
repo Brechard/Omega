@@ -2,6 +2,7 @@ package Debug;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -90,6 +91,7 @@ public class GameController2 {
 	
 	public void startDictionariesGameSimpleGame(ArrayList<Cell> listCells) {
 		cellsIdToXY = new String[listCells.size()];
+		
 		for(Cell cell: listCells) {
 			cellsIdToXY[cell.id] = cell.printXY();
 			xyToIdMap.put(cell.printXY(), cell.id);
@@ -104,4 +106,7 @@ public class GameController2 {
 		return gameHistory;
 	}
 
+	public Game getGame() {
+		return game;
+	}
 }

@@ -35,7 +35,8 @@ public class GameController {
 	private SimpleGame simpleGame;
 	private String[] cellsIdToXY;
 	private HashMap<String, Integer> xyToIdMap = new HashMap<>();
-	private int playerAI;
+	public int playerAI;
+	public int playerOpponent;
 	private TextFileManager fileManager;
 	public final int numberRoundsAInotPlay;
 	private int round = 0;
@@ -55,6 +56,7 @@ public class GameController {
 		this.moves = new Integer[numberOfPlayers][2];
 		this.simpleGame = simpleGame;
 		this.playerAI = playerAI;
+		playerOpponent = playerAI == 1 ? 2 : 1;
 		calculateHashes(simpleGame.getGame().length);
 		ArrayList<Cell> allCells = new ArrayList<Cell>(game.emptyCells);
 		allCells.addAll(game.player1);
@@ -110,6 +112,7 @@ public class GameController {
 		System.out.println("Player 1 = " +game.getPunctuation(1)+ ".");
 		System.out.println("Player 2 = " +game.getPunctuation(2)+ ".");
 		SearchAlgorithms.numberOfSearches = 0;
+		searchController.calculateWhileOtherPlays();
 	}
 	
 	public void startSearchingWhileOpponentThinks() {
@@ -281,6 +284,10 @@ public class GameController {
 
 	public ArrayList<String> getGameHistory() {
 		return gameHistory;
+	}
+	
+	public Game getGame() {
+		return game;
 	}
 
 }

@@ -42,7 +42,7 @@ public class SearchAlgorithms2 {
 			}
 		};
 		counterThread.start();
-		for(int depth = 1; depth <= maxDepth; depth++ ) {
+		for(int depth = maxDepth / 2 + 1; depth <= maxDepth; depth++ ) {
 			long alpha = - delta; 
 			long beta = + delta;
 			numberOfSearches = 0;

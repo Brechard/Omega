@@ -22,6 +22,7 @@ public class PlayGame {
 	private static int depthToSearch = 1;
 	private final static int boardSize = 800;
 	private static GameController gameController;
+	private static int aiSearch = 0;
 
 	public static void debug(int depth, int sizeSideHex) {
 		sizeSideHexagon = sizeSideHex;
@@ -67,11 +68,10 @@ public class PlayGame {
 	}
 	
 	public static void playAIvsAI() {
-		
+		sizeSideHexagon = 5;
+		numberOfHexagonsCenterRow = sizeSideHexagon * 2 - 1;
 		SimpleGame simpleGame1 = new SimpleGame(sizeSideHexagon, 1);
 		SimpleGame simpleGame2 = new SimpleGame(sizeSideHexagon, 2);
-		simpleGame1.getPlayerAI();
-		simpleGame2.getPlayerAI();
 		game = new Game(numberOfHexagonsCenterRow, 1);
 
 		GameController2 gameControllerHelper = new GameController2(game, simpleGame1, simpleGame2, 2, 1);
@@ -89,18 +89,18 @@ public class PlayGame {
 			printGame(game);
 		}
 	}
-	
 	public static void searchAIvsAI(GameController2 gameController, SimpleGame simpleGame) {
 		System.out.println();
 		System.out.println("Calculating ...");
-		if((i & 1) == 0 && i != 0) {
+		aiSearch++;
+		
+		if(aiSearch % 4 == 0) {
 			depthToSearch++;
 			System.out.println("DEPTH AUGMENTED TO "+depthToSearch);
 		}
-		i++;
 		Debug.SearchAlgorithms2.initiateMovesMade(simpleGame.getGame().length);
 
-		String[] result = Debug.SearchAlgorithms2.aspirationSearch(simpleGame, 10, depthToSearch, gameController, 12000);
+		String[] result = Debug.SearchAlgorithms2.aspirationSearch(simpleGame, 600, depthToSearch, gameController, 120);
 		System.out.println("Response: " +Arrays.asList(result));
 		gameController.movesForAI(result[1]);
 		debugPrintSimpleGame(result[1], gameController);

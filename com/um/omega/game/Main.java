@@ -18,11 +18,11 @@ public class Main{
 	public static final int numberOfPlayers = 2;
 	public final static int sizeSideHexagon = 5;
 	
-	private static int initialDepthToSearch = 4;
+	private static int initialDepthToSearch = 3;
 	public static int numberOfHexagonsCenterRow;
 	private static JFrame frame = new JFrame("Board");
 	public static GameController gameController;
-	private static int numberRoundsAInotPlay = 3;
+	private static int numberRoundsAInotPlay = 4;
 
 	// private static int numberOfSearches = 0;
 	// Check Bitboard
@@ -31,9 +31,9 @@ public class Main{
 
 		numberOfHexagonsCenterRow = sizeSideHexagon * 2 - 1;
 
-		play(recoverLastGame(true));
+		play(recoverLastGame(false));
 		
-//		playAIvsAI();
+//		Debug.PlayGame.playAIvsAI();
 
 //		debug(depthToSearch);
 		
@@ -79,6 +79,20 @@ public class Main{
 			gameController = new GameController(game, simpleGame, numberOfPlayers, playerAI, gamesRecovered.playerTurn, gamesRecovered.fileNumber, numberRoundsAInotPlay, initialDepthToSearch);
 		else gameController = new GameController(game, simpleGame, numberOfPlayers, playerAI, numberRoundsAInotPlay, initialDepthToSearch);
 
+//		gameController.moveAI(1, 0, -4, 0);
+//		gameController.moveAI(2, 1, -4, 1);
+//		gameController.moveAI(1, 2, -4, 2);
+//		gameController.moveAI(2, 3, -4, 3);
+//		gameController.moveAI(1, 4, -4, 4);
+//		gameController.moveAI(2, -1, -3, 5);
+//		gameController.moveAI(1, 0, -3, 6);
+//		gameController.moveAI(2, 1, -3, 7);
+//		gameController.moveAI(1, 2, -3, 8);
+//		gameController.moveAI(2, 3, -3, 9);
+//		gameController.moveAI(1, 4, -3, 10);
+//		gameController.moveAI(2, -2, -2, 11);
+		printGame();
+		
 		if(gameController.isAIturn() && gameController.isAIallowToPlay())
 			gameController.playForAI();
 		else gameController.startSearchingWhileOpponentThinks();
