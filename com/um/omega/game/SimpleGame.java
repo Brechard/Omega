@@ -11,7 +11,7 @@ public class SimpleGame {
 	private int numberOfHexagonsSide;
 	private int[] game;
 	private int playerAI;
-	private int playerCalculate;
+	public int playerCalculate;
 	private int playerToMove;
 	public UnionFind unionAI;
 	public UnionFind unionOpponent;
@@ -213,10 +213,10 @@ public class SimpleGame {
 		return playerToMove;
 	}
 	
-	public SimpleGame setAIPlayer(int player) {
-		playerAI = player;
-		return this;
-	}
+//	public SimpleGame setAIPlayer(int player) {
+//		playerAI = player;
+//		return this;
+//	}
 }
 
 

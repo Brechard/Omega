@@ -31,7 +31,7 @@ public class Main{
 
 		numberOfHexagonsCenterRow = sizeSideHexagon * 2 - 1;
 
-		play(recoverLastGame(true));
+		play(recoverGame("gameHistory_JavaFriendly-5-8.txt"));
 		
 //		Debug.PlayGame.playAIvsAI();
 

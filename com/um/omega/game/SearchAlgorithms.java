@@ -117,8 +117,12 @@ public class SearchAlgorithms {
 		for(int child = 0; child < childGames.size(); child++) {
 			valueHelper = alphaBetaWithTT(childGames.get(child), depth -1,(long) -beta,(long) -alpha, gameController, moves);
 //			final int child2 = child; 
+			System.out.println("Depth " +depth+ " child: " +child+ " value " +Arrays.toString(valueHelper));
+			System.out.println("Last move: " +Arrays.toString(childGames.get(child).lastMoves[0])+ "," +Arrays.toString(childGames.get(child).lastMoves[1]));
 			value = -Long.valueOf(valueHelper[0]);
 			if(value > score) {
+				System.out.println("BEST move, AI: " +childGames.get(child).getPlayerAI()+ " playerCalculate: " +childGames.get(child).playerCalculate);
+				System.out.println();
 //				final int child2 = child;
 //				new Thread() {
 //					public void run() {

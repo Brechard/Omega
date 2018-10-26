@@ -26,11 +26,11 @@ public class SearchController {
 	
 	public String[] startAlphaBetaSearch() {
 		SearchAlgorithms.initiateMovesMade(simpleGame.getGame().length);
-		return SearchAlgorithms.alphaBetaWithTT(simpleGame.setAIPlayer(gameController.playerAI), depthToSearch, -999999, 999999, gameController, SearchAlgorithms.getOrderedMovesMade());
+		return SearchAlgorithms.alphaBetaWithTT(simpleGame, depthToSearch, -999999, 999999, gameController, SearchAlgorithms.getOrderedMovesMade());
 	}
 	
 	public String[] startAspirationSearch(int window, int maxTime) {
-		return SearchAlgorithms.aspirationSearch(simpleGame.setAIPlayer(gameController.playerOpponent), window, depthToSearch, gameController, maxTime);
+		return SearchAlgorithms.aspirationSearch(simpleGame, window, depthToSearch, gameController, maxTime);
 	}
 	
 	public void calculateWhileOtherPlays() {

@@ -87,6 +87,7 @@ public class TextFileManager {
 	}
 	
 	public static Games recoverGame(String fileName) {
+		System.out.println("Loading game: " +fileName);
 		FileReader fr = null;
 		BufferedReader br = null;
 		Games games = null;
