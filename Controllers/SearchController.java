@@ -34,6 +34,7 @@ public class SearchController {
 	}
 	
 	public void calculateWhileOtherPlays() {
+		//TODO The idea was nice but the execution not that good, it has to be redone
 //		finishPreviousCalculating();
 //		Thread searchThread = new Thread() {
 //			public void run() {
