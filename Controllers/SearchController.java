@@ -1,7 +1,5 @@
 package Controllers;
 
-import java.util.Arrays;
-
 import com.um.omega.game.SearchAlgorithms;
 import com.um.omega.game.SimpleGame;
 

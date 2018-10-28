@@ -5,10 +5,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 
-import javax.swing.text.html.MinimalHTMLWriter;
-
 import Controllers.GameController;
-import Helpers.Parsers;
 import ObjectsToHelp.Flag;
 import ObjectsToHelp.TTInfo;
 
@@ -35,6 +32,7 @@ public class SearchAlgorithms {
 		startCalculating();
 		
 		Thread counterThread = new Thread() {
+			@Override
 			public void run() {
 				try {
 					Thread.sleep(counter * 1000);
@@ -63,12 +61,12 @@ public class SearchAlgorithms {
 			result = newResult;
 			if( score >= beta && calculate) {
 				alpha = score; 
-				beta = (long) Long.MAX_VALUE;
+				beta = Long.MAX_VALUE;
 //				System.out.println("Failed high " +depth+ " alpha: " +alpha+ " beta: " +beta);
 				result = alphaBetaWithTT(game, depth, alpha, beta, gameController, moves);
 				score = Long.valueOf(result[0]);
 			} else if( score <= alpha && calculate) {
-				alpha  = (long) Long.MIN_VALUE;
+				alpha  = Long.MIN_VALUE;
 				beta = score;
 //				System.out.println("Failed low " +depth+ " alpha: " +alpha+ " beta: " +beta);
 				result = alphaBetaWithTT(game, depth, alpha, beta, gameController, moves);
@@ -114,7 +112,7 @@ public class SearchAlgorithms {
 		long value;
 
 		for(int child = 0; child < childGames.size(); child++) {
-			valueHelper = alphaBetaWithTT(childGames.get(child), depth -1,(long) -beta,(long) -alpha, gameController, moves);
+			valueHelper = alphaBetaWithTT(childGames.get(child), depth -1,-beta,-alpha, gameController, moves);
 //			final int child2 = child; 
 //			System.out.println("Depth " +depth+ " child: " +child+ " value " +Arrays.toString(valueHelper));
 //			System.out.println("Last move: " +Arrays.toString(childGames.get(child).lastMoves[0])+ "," +Arrays.toString(childGames.get(child).lastMoves[1]));

@@ -1,9 +1,7 @@
 package com.um.omega.game;
 
 import java.security.SecureRandom;
-import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 
 public class Cell{
     

@@ -1,15 +1,10 @@
 package Controllers;
 
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-
 import com.um.omega.game.Cell;
 import com.um.omega.game.Game;
-import com.um.omega.game.Main;
 import com.um.omega.game.SearchAlgorithms;
 import com.um.omega.game.SimpleGame;
 
@@ -71,7 +66,7 @@ public class GameController {
 		else {
 			fileManager = new TextFileManager(numberFile);			
 			gameHistory = fileManager.getPlayHistory();
-			round = (int) gameHistory.size() / 2;			
+			round = gameHistory.size() / 2;			
 		}
 		this.numberRoundsAInotPlay = numberRoundsAInotPlay;
 		this.searchController = new SearchController(simpleGame, this, initialDepthToSearch, round);

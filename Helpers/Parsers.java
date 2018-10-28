@@ -1,9 +1,6 @@
 package Helpers;
 
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Arrays;
-
 import javax.swing.JFrame;
 
 import com.um.omega.game.Game;

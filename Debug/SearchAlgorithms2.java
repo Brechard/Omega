@@ -8,7 +8,6 @@ import java.util.HashMap;
 import com.um.omega.game.SimpleGame;
 
 import Controllers.GameController;
-import Helpers.Parsers;
 import ObjectsToHelp.Flag;
 import ObjectsToHelp.TTInfo;
 
@@ -31,6 +30,7 @@ public class SearchAlgorithms2 {
 		startCalculating();
 		
 		Thread counterThread = new Thread() {
+			@Override
 			public void run() {
 				try {
 					Thread.sleep(counter * 1000);
@@ -60,12 +60,12 @@ public class SearchAlgorithms2 {
 			result = newResult;
 			if( score >= beta ) {
 				alpha = score; 
-				beta = (long) Long.MAX_VALUE;
+				beta = Long.MAX_VALUE;
 				System.out.println("Failed high " +depth+ " alpha: " +alpha+ " beta: " +beta);
 				result = alphaBetaWithTT(game, depth, alpha, beta, gameController, moves);
 				score = Long.valueOf(result[0]);
 			} else if( score <= alpha ) {
-				alpha  = (long) Long.MIN_VALUE;
+				alpha  = Long.MIN_VALUE;
 				beta = score;
 				System.out.println("Failed low " +depth+ " alpha: " +alpha+ " beta: " +beta);
 				result = alphaBetaWithTT(game, depth, alpha, beta, gameController, moves);
@@ -111,7 +111,7 @@ public class SearchAlgorithms2 {
 		long value;
 
 		for(int child = 0; child < childGames.size(); child++) {
-			valueHelper = alphaBetaWithTT(childGames.get(child), depth -1,(long) -beta,(long) -alpha, gameController, moves);
+			valueHelper = alphaBetaWithTT(childGames.get(child), depth -1,-beta,-alpha, gameController, moves);
 //			final int child2 = child; 
 			value = -Long.valueOf(valueHelper[0]);
 			if(value > score) {
@@ -180,7 +180,7 @@ public class SearchAlgorithms2 {
 		long value;
 
 		for(int child = 0; child < childGames.size(); child++) {
-			valueHelper = basicAlphaBetaWithTT(childGames.get(child), depth -1,(long) -beta,(long) -alpha, gameController);
+			valueHelper = basicAlphaBetaWithTT(childGames.get(child), depth -1,-beta,-alpha, gameController);
 //			final int child2 = child; 
 			value = -Long.valueOf(valueHelper[0]);
 			if(value > score) {

@@ -1,12 +1,9 @@
 package Debug;
 
-import java.util.Arrays;
-
 import javax.swing.JFrame;
 
 import com.um.omega.game.Game;
 import com.um.omega.game.Main;
-import com.um.omega.game.SearchAlgorithms;
 import com.um.omega.game.SimpleGame;
 import com.um.omega.game.UserInterface;
 
@@ -45,11 +42,11 @@ public class Test {
 		long score = Long.valueOf(result[0]);
 		if( score >= beta ) {
 			alpha = score; 
-			beta = (long) Long.MAX_VALUE;
+			beta = Long.MAX_VALUE;
 			System.out.println("Failed high, the new values are: alpha = " +alpha+ " beta = " +beta);
 			result = SearchAlgorithms2.basicAlphaBetaWithTT(simpleGame, depthToSearch, alpha, beta, gameController);
 		} else if( score <= alpha ) {
-			alpha  = (long) Long.MIN_VALUE;
+			alpha  = Long.MIN_VALUE;
 			beta = score;
 			System.out.println("Failed low, the new values are: alpha = " +alpha+ " beta = " +beta);
 			result = SearchAlgorithms2.basicAlphaBetaWithTT(simpleGame, depthToSearch, alpha, beta, gameController);

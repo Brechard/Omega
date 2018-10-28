@@ -3,9 +3,7 @@ package Helpers;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import com.um.omega.game.Game;
-import com.um.omega.game.Main;
-import Helpers.Parsers;;
+import com.um.omega.game.Game;;
 
 public class Moves {
 			

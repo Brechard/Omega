@@ -6,14 +6,11 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 
 import javax.swing.JPanel;
 
 import Controllers.GameController;
-import Helpers.Moves;
-import Helpers.Parsers;
 
 public class UserInterface extends JPanel implements MouseListener{
 	private static int boardSize;
@@ -27,13 +24,14 @@ public class UserInterface extends JPanel implements MouseListener{
 	
 	public UserInterface(int boardSize, int size, Game game, GameController gameController) {
 		
-		this.boardSize = boardSize;
-		this.numberHexMiddleRow = size * 2 - 1;
-		this.game = game;
-		this.gameController = gameController;
+		UserInterface.boardSize = boardSize;
+		UserInterface.numberHexMiddleRow = size * 2 - 1;
+		UserInterface.game = game;
+		UserInterface.gameController = gameController;
         addMouseListener(this);
 	}
 		
+	@Override
 	public void paintComponent(Graphics g){
 		super.paintComponent(g);
 //		this.setBackground(Color.WHITE);

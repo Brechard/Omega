@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import Helpers.SimpleGameHelpers;
-import ObjectsToHelp.CellType;
 
 public class SimpleGame {
 
