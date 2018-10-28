@@ -149,6 +149,75 @@ public class SearchAlgorithms2 {
 		return valueToReturn;
 	}
 	
+	public static String[] basicAlphaBetaWithTT(SimpleGame game, int depth, long alpha, long beta, GameController gameController) {
+		numberOfSearches++;
+		
+		long originalAlpha = alpha;
+		long hash = gameController.getHash(game.getGame());
+		
+		if(hashMap.containsKey(hash) && hashMap.get(hash).depth >= depth) {
+			TTInfo gameInfo = hashMap.get(hash);
+			
+			if (gameInfo.flag == Flag.EXACT) 
+				return gameInfo.getInfo();
+			else if (gameInfo.flag == Flag.LOWER_BOUND)
+				alpha = Math.max(alpha, gameInfo.value);
+			else if (gameInfo.flag == Flag.UPPER_BOUND) 
+				beta = Math.min(beta, gameInfo.value);
+			if (alpha >= beta)
+				return gameInfo.getInfo();
+		}
+		
+		if(!game.isPossibleMoreMoves() || depth == 0 || !calculate) {
+			return new String[] {String.valueOf(game.getRate()), game.getPlayHistory()};
+		}
+		
+		long score = Long.MIN_VALUE;
+
+		String[] valueToReturn = new String[] {String.valueOf(score), ""};
+		String[] valueHelper = new String[] {String.valueOf(score), ""};
+		ArrayList<SimpleGame> childGames = game.possibleGames();
+		long value;
+
+		for(int child = 0; child < childGames.size(); child++) {
+			valueHelper = basicAlphaBetaWithTT(childGames.get(child), depth -1,(long) -beta,(long) -alpha, gameController);
+//			final int child2 = child; 
+			value = -Long.valueOf(valueHelper[0]);
+			if(value > score) {
+//				final int child2 = child;
+//				new Thread() {
+//					public void run() {
+//					System.out.println("Depth: " +depth+ " move: " +i[1]);
+//				}
+//				moves = getOrderedMovesMade();
+//					}
+//				}.start();
+				score = value;
+				valueToReturn = new String[]{String.valueOf(value), valueHelper[1]};
+			}
+			if(score > alpha) alpha = score;
+			if(score >= beta) {
+				prunings++;
+				break;
+			}
+		}
+		
+	 	Flag flag;
+		/* Fail-low result implies an upper bound */ 
+		if (score <= originalAlpha)
+			flag = Flag.UPPER_BOUND;
+		
+		/* Fail-high result implies a lower bound */ 
+		else if (score >= beta) 
+			flag = Flag.LOWER_BOUND;
+		else  flag = Flag.EXACT;
+
+		hashMap.put(hash, new TTInfo(flag, valueHelper, depth));
+
+		return valueToReturn;
+	}
+
+	
 	public static void initiateMovesMade(int size) {
 		movesMade = new int[size][2];
 		for(int i = 0; i < size; i++)
@@ -169,6 +238,12 @@ public class SearchAlgorithms2 {
 	
 	public static void cleanHashMap() {
 		hashMap = new HashMap<Long, TTInfo>();
+	}
+	
+	public static void resetSearch() {
+		hashMap = new HashMap<Long, TTInfo>();
+		numberOfSearches = 0;
+		prunings = 0;
 	}
 	
 	public static void finishCalculating() {

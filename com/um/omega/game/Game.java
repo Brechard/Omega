@@ -20,6 +20,20 @@ public class Game {
 	public UnionFind union1;
 	public UnionFind union2;
 	
+	/**
+	 * Human game, used only for representation, a lot of extra method are still here that were used when this
+	 * used to be only game. After the creation of SimpleGame this should only be use to represent the actual state
+	 * of the game and to interact with human but NEVER FOR SEARCHING
+	 * @param player1
+	 * @param player2
+	 * @param emptyCells
+	 * @param lastMove
+	 * @param depth
+	 * @param playerToPlay
+	 * @param playHistory
+	 * @param union1
+	 * @param union2
+	 */
 	public Game(ArrayList<Cell> player1, ArrayList<Cell> player2, ArrayList<Cell> emptyCells, Cell[] lastMove, 
 			int depth, int playerToPlay, String playHistory, UnionFind union1, UnionFind union2) {
 //		System.out.println();

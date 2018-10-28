@@ -24,6 +24,9 @@ public class TextFileManager {
 	private String numberFile;
 	
 	public TextFileManager(int playerAI) {
+		File file = new File("history/");
+		if(!file.exists())
+			file.mkdirs();
 		numberFile = "-" +Main.sizeSideHexagon+ "-" +new File("history/").listFiles().length/2;
 		try {
 			PrintWriter outJavaFriendly = new PrintWriter("history/gameHistory_JavaFriendly" +numberFile+ ".txt");

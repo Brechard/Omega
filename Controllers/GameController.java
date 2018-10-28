@@ -46,7 +46,11 @@ public class GameController {
 	 * @param game
 	 * @param simpleGame
 	 * @param numberOfPlayers
-	 * @param firstPlayer
+	 * @param playerAI
+	 * @param playerToPlay
+	 * @param numberFile
+	 * @param numberRoundsAInotPlay
+	 * @param initialDepthToSearch
 	 */
 	public GameController(Game game, SimpleGame simpleGame, int numberOfPlayers, int playerAI, int playerToPlay, String numberFile, int numberRoundsAInotPlay, int initialDepthToSearch) {
 		this.game = game;
@@ -79,13 +83,17 @@ public class GameController {
 	 * @param simpleGame
 	 * @param numberOfPlayers
 	 * @param playerAI
+	 * @param numberRoundsAInotPlay
+	 * @param initialDepthToSearch
 	 */
 	public GameController(Game game, SimpleGame simpleGame, int numberOfPlayers, int playerAI, int numberRoundsAInotPlay, int initialDepthToSearch) {
 		this(game, simpleGame, numberOfPlayers, playerAI, 1, null, numberRoundsAInotPlay, initialDepthToSearch);
 	}
 
 	/**
-	 * Create a game from scratch where the AI is allow to play from the beginning
+	 * Create a game from scratch where the AI is allow to play from the beginning and with an initial search depth of 1
+	 * Use it only if the initial depth parameter is not something of relevance because the search testing is not going
+	 * to use the Search Controller
 	 * @param game
 	 * @param simpleGame
 	 * @param numberOfPlayers
@@ -109,8 +117,6 @@ public class GameController {
 	
 	public void playForAI() {
 		movesForAI(searchController.startSearching());
-		System.out.println("Player 1 = " +game.getPunctuation(1)+ ".");
-		System.out.println("Player 2 = " +game.getPunctuation(2)+ ".");
 		SearchAlgorithms.numberOfSearches = 0;
 		searchController.calculateWhileOtherPlays();
 	}
@@ -144,16 +150,16 @@ public class GameController {
 		int id;
 		try{
 			id = game.setCellToPlayer(playerToMove, x, y);
-			System.out.println("The cell ID is: " +id);
+			System.out.println(" with ID: " +id);
 		} catch (Error e) {
 			System.err.println(e+ ", cell already in use");
 			return;
 		}
+		System.err.println();
 		moves[playerToMove - 1] = new Integer[]{x, y, id};
 		playerToMove++;
 		if(playerToMove > numberOfPlayers)
-			playerToMove = 1;
-		
+			playerToMove = 1;		
 	}
 	
 	public boolean confirmMoves() {
@@ -171,8 +177,7 @@ public class GameController {
 		}
 		playerFinish();
 		System.out.println();
-		System.out.println("Moves confirmed");
-		System.out.println("It is the turn of the player: " +playerToPlay);
+		System.out.println("It is time for the player " +playerToPlay+ " to play");
 		System.out.println();
 		return !game.isPossibleMoreRounds();
 	}
@@ -288,6 +293,10 @@ public class GameController {
 	
 	public Game getGame() {
 		return game;
+	}
+	
+	public SimpleGame getSimpleGame() {
+		return simpleGame;
 	}
 
 }

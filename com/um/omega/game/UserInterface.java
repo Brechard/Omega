@@ -16,10 +16,6 @@ import Helpers.Moves;
 import Helpers.Parsers;
 
 public class UserInterface extends JPanel implements MouseListener{
-	private static int xPos = 100;
-	private static int yPos = 200;
-	private static int width = 10;
-	private static int height = 10;
 	private static int boardSize;
 	private static int numberHexMiddleRow;
 	private static Game game;
@@ -40,7 +36,7 @@ public class UserInterface extends JPanel implements MouseListener{
 		
 	public void paintComponent(Graphics g){
 		super.paintComponent(g);
-//		this.setBackground(Color.YELLOW);
+//		this.setBackground(Color.WHITE);
 //		g.drawString("Omega", Main.sizeX / 2, 50);
 		drawHexagonGrid(g, new Cell(boardSize / 2, boardSize/2, 0), numberHexMiddleRow , boardSize / numberHexMiddleRow, 0);
 	}
@@ -94,7 +90,7 @@ public class UserInterface extends JPanel implements MouseListener{
 			for(Hexagon h: grid) {
 				if(h.contains(e.getX(), e.getY())) {
 					String move = "(" +h.getxCubePosition()+ "," + h.getyCubePosition() +")";
-					System.out.println("The cell clicked is: " +move);
+					System.out.print("Cell: " +move);
 					gameController.moveMade(h.getxCubePosition(), h.getyCubePosition());
 					return;
 				}

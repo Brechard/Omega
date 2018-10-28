@@ -6,6 +6,7 @@ import java.util.Scanner;
 import javax.swing.JFrame;
 
 import Controllers.GameController;
+import Debug.Test;
 import Helpers.Parsers;
 import Helpers.TextFileManager;
 import ObjectsToHelp.Games;
@@ -18,7 +19,7 @@ public class Main{
 	public static final int numberOfPlayers = 2;
 	public final static int sizeSideHexagon = 5;
 	
-	private static int initialDepthToSearch = 2;
+	private static int initialDepthToSearch = 3;
 	public static int numberOfHexagonsCenterRow;
 	private static JFrame frame = new JFrame("Board");
 	public static GameController gameController;
@@ -31,7 +32,9 @@ public class Main{
 
 		numberOfHexagonsCenterRow = sizeSideHexagon * 2 - 1;
 
-		play(recoverGame("gameHistory_JavaFriendly-5-8.txt"));
+		play(recoverLastGame(false));
+		
+//		Debug.Test.windowsTest();
 		
 //		Debug.PlayGame.playAIvsAI();
 
@@ -79,26 +82,13 @@ public class Main{
 			gameController = new GameController(game, simpleGame, numberOfPlayers, playerAI, gamesRecovered.playerTurn, gamesRecovered.fileNumber, numberRoundsAInotPlay, initialDepthToSearch);
 		else gameController = new GameController(game, simpleGame, numberOfPlayers, playerAI, numberRoundsAInotPlay, initialDepthToSearch);
 
-//		gameController.moveAI(1, 0, -4, 0);
-//		gameController.moveAI(2, 1, -4, 1);
-//		gameController.moveAI(1, 2, -4, 2);
-//		gameController.moveAI(2, 3, -4, 3);
-//		gameController.moveAI(1, 4, -4, 4);
-//		gameController.moveAI(2, -1, -3, 5);
-//		gameController.moveAI(1, 0, -3, 6);
-//		gameController.moveAI(2, 1, -3, 7);
-//		gameController.moveAI(1, 2, -3, 8);
-//		gameController.moveAI(2, 3, -3, 9);
-//		gameController.moveAI(1, 4, -3, 10);
-//		gameController.moveAI(2, -2, -2, 11);
 		printGame();
 		
 		if(gameController.isAIturn() && gameController.isAIallowToPlay())
 			gameController.playForAI();
 		else gameController.startSearchingWhileOpponentThinks();
-//		else
+
 		printGame();
-		System.out.println(Arrays.toString(simpleGame.getGame()));
 
 		boolean lastRound = false;
 		
@@ -106,6 +96,7 @@ public class Main{
 			
 			System.out.println();
 			System.out.println("It is time for the player " +gameController.getPlayerToPlay()+ " to play");
+			System.out.println("Select the moves in the user interface and then confirm here if they are correct");
 			System.out.println("Play the moves");
 			System.out.println("Player 1 (White, " +(playerAI == 1 ? " AI" : " OPPONENT")+"): ");
 
@@ -124,14 +115,11 @@ public class Main{
 				gameController.undoMoves();
 			} else {
 				lastRound |= gameController.confirmMoves();
-				System.out.println("Is AI allowed to play? : " +gameController.isAIallowToPlay()+ " is AI turn? " + gameController.isAIturn());
+//				System.out.println("Is AI allowed to play? : " +gameController.isAIallowToPlay()+ " is AI turn? " + gameController.isAIturn());
 				if(gameController.isAIallowToPlay() && gameController.isAIturn()) {
 					if(gameController.getAIPlayer() == 1 && lastRound)
 						break;
-					System.out.println(Arrays.toString(simpleGame.getGame()));
-					System.out.println("---- PlayerToPlay (gameController):  " +gameController.getPlayerToPlay()+ " simpleGame AIPlayer: " +simpleGame.getPlayerAI());
 					gameController.playForAI();
-					System.out.println("--------- PlayerToPlay (gameController):  " +gameController.getPlayerToPlay()+ " simpleGame AIPlayer: " +simpleGame.getPlayerAI());
 					lastRound |= !game.isPossibleMoreRounds();
 					if(gameController.getAIPlayer() == 1 && lastRound)
 						lastRound = false;					
@@ -187,9 +175,6 @@ public class Main{
 		
 	}
 
-	public static void printGame() {
-		printGame(game);
-	}
 	
 	public static void printGameDebug() {
 		JFrame frame = new JFrame("Board FOR DEBUG");
@@ -198,6 +183,10 @@ public class Main{
 		frame.add(ui);
 		frame.setSize(boardSize, boardSize);
 		frame.setVisible(true);
+	}
+	
+	public static void printGame() {
+		printGame(game);
 	}
 	
 	public static void printGame(Game game) {

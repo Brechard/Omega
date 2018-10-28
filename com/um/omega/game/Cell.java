@@ -10,6 +10,7 @@ public class Cell{
 	public int x;
     public int y;
     public long hash;
+    // This was for a test but it is not used anymore
     private HashSet<Cell> neighbours = new HashSet<Cell>() {};
     public int id;
 

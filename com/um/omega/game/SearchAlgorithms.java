@@ -24,9 +24,9 @@ public class SearchAlgorithms {
 		
 	public static String[] aspirationSearch(SimpleGame game, int delta, int maxDepth, GameController gameController, final int counter) {
 		int minutes = counter/60;
-		System.out.println("Start the search, depth: " +maxDepth+ " for AI player: " +game.getPlayerAI()
-			+ " with a maximum time to calculate it of " +minutes+ " minutes " +(counter - minutes*60)+ "s");
-		System.out.println("GAME USED IN SEARCH: " +game.getPlayHistory());
+//		System.out.println("Start the search, depth: " +maxDepth+ " for AI player: " +game.getPlayerAI()
+//			+ " with a maximum time to calculate it of " +minutes+ " minutes " +(counter - minutes*60)+ "s");
+//		System.out.println("GAME USED IN SEARCH: " +game.getPlayHistory());
 		searching = true;
 //		System.out.println("Is it possible to keep playing?" +(game.emptyCells.size() < 4)+ " and " +(game.playerToPlay == Main.gameController.getFirstPlayer()));
 		String[] result = null;
@@ -45,7 +45,7 @@ public class SearchAlgorithms {
 			}
 		};
 		counterThread.start();
-		for(int depth = 2; depth <= maxDepth; depth++ ) {
+		for(int depth = 1; depth <= maxDepth; depth++ ) {
 			long alpha = - delta; 
 			long beta = + delta;
 			numberOfSearches = 0;
@@ -55,19 +55,19 @@ public class SearchAlgorithms {
 			
 //			Main.debugPrintSimpleGame(newResult[1], gameController);;
 			long score = Long.valueOf(newResult[0]);
-			System.out.println("For depth " +depth+ " the result is: " +Arrays.toString(newResult));
+//			System.out.println("For depth " +depth+ " the result is: " +Arrays.toString(newResult));
 			if(newResult[1] == null || newResult[1] == "" || (result != null && newResult[1].length() < result[1].length())) {
-				System.out.println("For depth " +depth+ " the result is an error");
+//				System.out.println("For depth " +depth+ " the result is an error");
 				break;
 			}
 			result = newResult;
-			if( score >= beta ) {
+			if( score >= beta && calculate) {
 				alpha = score; 
 				beta = (long) Long.MAX_VALUE;
 //				System.out.println("Failed high " +depth+ " alpha: " +alpha+ " beta: " +beta);
 				result = alphaBetaWithTT(game, depth, alpha, beta, gameController, moves);
 				score = Long.valueOf(result[0]);
-			} else if( score <= alpha ) {
+			} else if( score <= alpha && calculate) {
 				alpha  = (long) Long.MIN_VALUE;
 				beta = score;
 //				System.out.println("Failed low " +depth+ " alpha: " +alpha+ " beta: " +beta);
@@ -89,10 +89,9 @@ public class SearchAlgorithms {
 		numberOfSearches++;
 		long originalAlpha = alpha;
 		long hash = gameController.getHash(game.getGame());
-		
+
 		if(hashMap.containsKey(hash) && hashMap.get(hash).depth >= depth) {
 			TTInfo gameInfo = hashMap.get(hash);
-			
 			if (gameInfo.flag == Flag.EXACT) 
 				return gameInfo.getInfo();
 			else if (gameInfo.flag == Flag.LOWER_BOUND)
@@ -117,20 +116,10 @@ public class SearchAlgorithms {
 		for(int child = 0; child < childGames.size(); child++) {
 			valueHelper = alphaBetaWithTT(childGames.get(child), depth -1,(long) -beta,(long) -alpha, gameController, moves);
 //			final int child2 = child; 
-			System.out.println("Depth " +depth+ " child: " +child+ " value " +Arrays.toString(valueHelper));
-			System.out.println("Last move: " +Arrays.toString(childGames.get(child).lastMoves[0])+ "," +Arrays.toString(childGames.get(child).lastMoves[1]));
+//			System.out.println("Depth " +depth+ " child: " +child+ " value " +Arrays.toString(valueHelper));
+//			System.out.println("Last move: " +Arrays.toString(childGames.get(child).lastMoves[0])+ "," +Arrays.toString(childGames.get(child).lastMoves[1]));
 			value = -Long.valueOf(valueHelper[0]);
 			if(value > score) {
-				System.out.println("BEST move, AI: " +childGames.get(child).getPlayerAI()+ " playerCalculate: " +childGames.get(child).playerCalculate);
-				System.out.println();
-//				final int child2 = child;
-//				new Thread() {
-//					public void run() {
-//					System.out.println("Depth: " +depth+ " move: " +i[1]);
-//				}
-//				moves = getOrderedMovesMade();
-//					}
-//				}.start();
 				score = value;
 				valueToReturn = new String[]{String.valueOf(value), valueHelper[1]};
 			}
@@ -138,7 +127,6 @@ public class SearchAlgorithms {
 			if(score >= beta) {
 				for(int[] i: childGames.get(child).lastMoves)
 					moveMade(i[1]);
-//				moves = getOrderedMovesMade();
 				prunings++;
 				break;
 			}
@@ -180,8 +168,8 @@ public class SearchAlgorithms {
 	}
 	
 	public static void finishCalculating(boolean timerOut) {
-		if(timerOut)
-			System.out.println("TAKING TOO LONG, STOP");
+//		if(timerOut)
+//			System.out.println("TAKING TOO LONG, STOP");
 		calculate = false;
 	}
 

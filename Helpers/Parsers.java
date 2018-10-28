@@ -41,10 +41,10 @@ public class Parsers {
 	
 	public static void parseNextMove(String s, GameController gameController) {
 		String[] movesReceived = s.split("\\.");
-		System.out.println("The moves received are " +s);
-		System.out.println("The moves already done are " +gameController.getGameHistory());
+//		System.out.println("The moves received are " +s);
+//		System.out.println("The moves already done are " +gameController.getGameHistory());
 		ArrayList<String> newMoves = Moves.getMoveToDo(movesReceived, gameController.getGameHistory());
-		System.out.println("The moves to do are: " +newMoves.toString());
+//		System.out.println("The moves to do are: " +newMoves.toString());
 		if(newMoves.size() >= 2) {
 			for(int i = 0; i < 2; i++) {
 				String cell = newMoves.get(i);

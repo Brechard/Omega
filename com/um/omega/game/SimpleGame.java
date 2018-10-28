@@ -18,7 +18,18 @@ public class SimpleGame {
 	private String playHistory = "";
 	public int[][] lastMoves;
 
-	public SimpleGame(int numberOfHexagonsSide, int playerAI, int[] game, int[][] moves, UnionFind[] unionFinds, String playHistory, int playerCalculate) {
+	/**
+	 * Game used by the AI, the game is represented in a one dimension array with the IDs of the cells.
+	 * This constructor is used internally for creating child games with a move for each player.
+	 * @param numberOfHexagonsSide
+	 * @param playerAI
+	 * @param game
+	 * @param moves
+	 * @param unionFinds
+	 * @param playHistory
+	 * @param playerCalculate
+	 */
+	private SimpleGame(int numberOfHexagonsSide, int playerAI, int[] game, int[][] moves, UnionFind[] unionFinds, String playHistory, int playerCalculate) {
 		this.numberOfHexagonsSide = numberOfHexagonsSide;
 		this.playerAI = playerAI;
 		this.playerCalculate = playerCalculate;
@@ -33,7 +44,19 @@ public class SimpleGame {
 		}
 	}
 
-	public SimpleGame(int numberOfHexagonsSide, int playerAI, int[] game, int[] moves, UnionFind[] unionFinds, String playHistory, int playerToMove, int playerCalculate) {
+	/**
+	 * Game used by the AI, the game is represented in a one dimension array with the IDs of the cells.
+	 * This constructor is used internally for creating child games with ONE move only.
+	 * @param numberOfHexagonsSide
+	 * @param playerAI
+	 * @param game
+	 * @param moves
+	 * @param unionFinds
+	 * @param playHistory
+	 * @param playerToMove
+	 * @param playerCalculate
+	 */
+	private SimpleGame(int numberOfHexagonsSide, int playerAI, int[] game, int[] moves, UnionFind[] unionFinds, String playHistory, int playerToMove, int playerCalculate) {
 		this.numberOfHexagonsSide = numberOfHexagonsSide;
 		this.playerAI = playerAI;
 		this.playerCalculate = playerCalculate;
@@ -46,7 +69,7 @@ public class SimpleGame {
 	}
 
 	/**
-	 * Create an empty game
+	 * Create an empty game for the AI
 	 * @param numberOfHexagonsCenterRow
 	 * @param playerToPlay
 	 */
@@ -139,32 +162,34 @@ public class SimpleGame {
 		return possibleGames;
 	}
 	
-//	public ArrayList<SimpleGame> possibleGames() {
-//		ArrayList<SimpleGame> possibleGames = new ArrayList<>();
-//		for(int i = 0; i < game.length; i++) {
-//			if(game[i] == 0) { // The Cell is empty
-//				for(int j = i + 1; j < game.length; j++) {
-////					System.out.print("Move 2 to do now "+moves[j][0]);
-////					System.out.println(", " +game[moves[j][0]]);
-//					if(game[j] == 0) {
-//						possibleGames.add(new SimpleGame(numberOfHexagonsSide, 
-//								playerToPlay == 1 ? 2 : 1,
-//								game,
-//								new int[][] {new int[] {1, i}, new int[] {2, j}},
-//								new UnionFind[] {union1, union2},
-//								playHistory));
-//						possibleGames.add(new SimpleGame(numberOfHexagonsSide, 
-//								playerToPlay == 1 ? 2 : 1,
-//								game,
-//								new int[][] {new int[] {2, i}, new int[] {1, j}},
-//								new UnionFind[] {union1, union2},
-//								playHistory));
-//					}
-//				}
-//			}
-//		}
-//		return possibleGames;
-//	}
+	public ArrayList<SimpleGame> possibleGames() {
+		ArrayList<SimpleGame> possibleGames = new ArrayList<>();
+		for(int i = 0; i < game.length; i++) {
+			if(game[i] == 0) { // The Cell is empty
+				for(int j = i + 1; j < game.length; j++) {
+//					System.out.print("Move 2 to do now "+moves[j][0]);
+//					System.out.println(", " +game[moves[j][0]]);
+					if(game[j] == 0) {
+						possibleGames.add(new SimpleGame(numberOfHexagonsSide, 
+								playerAI,
+								game,
+								new int[][] {new int[] {1, i}, new int[] {2, j}},
+								new UnionFind[] {unionAI, unionOpponent},
+								playHistory,
+								playerCalculate == 1 ? 2 : 1));
+						possibleGames.add(new SimpleGame(numberOfHexagonsSide, 
+								playerAI,
+								game,
+								new int[][] {new int[] {2, i}, new int[] {1, j}},
+								new UnionFind[] {unionAI, unionOpponent},
+								playHistory,
+								playerCalculate == 1 ? 2 : 1));
+					}
+				}
+			}
+		}
+		return possibleGames;
+	}
 
 		
 	public int[] getGame() {
